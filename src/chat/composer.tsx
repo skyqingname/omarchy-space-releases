@@ -1,5 +1,7 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { ArrowUp, ShieldAlert, Square } from 'lucide-react';
+import { ArrowUp, Paperclip, ShieldAlert, Square } from 'lucide-react';
+import { AttachmentList, useAttachments } from './attachments';
+import { attachmentMessage } from './attachment-model';
 import product from '../../product.config.json';
 import { slashMatches, usedTokens } from './model';
 import type { Meter } from './model';
@@ -62,16 +64,21 @@ function MeterView({ meter }: { meter: Meter }) {
 
 type Props = {
   session: string; enabled: boolean; working: boolean; visible: boolean; user: string; meter: Meter | null; placeholder: string;
-  onSend: (text: string) => void; onStop: () => void;
+  onSend: (text: string) => Promise<void>; onStop: () => void;
 };
 
 export function Composer({ session, enabled, working, visible, user, meter, placeholder, onSend, onStop }: Props) {
   const { draft, change, clear } = useDraft(session);
   const [pick, setPick] = useState(0);
   const [dismissed, setDismissed] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState('');
+  const attachments = useAttachments(session, enabled && !sending, visible);
+  const currentSession = useRef(session);
+  currentSession.current = session;
   const textarea = useRef<HTMLTextAreaElement>(null);
   const menu = useRef<HTMLDivElement>(null);
-  const commands = dismissed ? [] : slashMatches(draft, product.chat.slash_commands);
+  const commands = dismissed || attachments.jobs.length || sending ? [] : slashMatches(draft, product.chat.slash_commands);
   const at = Math.min(pick, commands.length - 1);
   useLayoutEffect(() => {
     const box = textarea.current!;
@@ -80,10 +87,23 @@ export function Composer({ session, enabled, working, visible, user, meter, plac
   }, [draft, visible]);
   useEffect(() => { menu.current?.querySelector('.active')?.scrollIntoView({ block: 'nearest' }); }, [at]);
 
-  const canSend = enabled && draft.trim().length > 0;
-  function send(text: string) {
-    clear();
-    onSend(text);
+  const canSend = enabled && !sending && !attachments.blocked && (draft.trim().length > 0 || attachments.jobs.length > 0);
+  useEffect(() => { setSendError(''); }, [session]);
+  async function send(text: string) {
+    if (!canSend) return;
+    if (attachments.jobs.length && /^[\/!]/.test(text.trim())) {
+      setSendError('附件请随普通消息发送；执行命令前请先移除附件。'); return;
+    }
+    const target = session;
+    const jobs = [...attachments.jobs];
+    setSending(true); setSendError('');
+    try {
+      await onSend(attachmentMessage(text, jobs));
+      attachments.queue.consume(jobs.map(job => job.id));
+      if (currentSession.current === target) clear();
+      else store(target, '');
+    } catch (reason) { setSendError(String(reason)); }
+    finally { setSending(false); }
   }
   function edit(text: string) {
     change(text);
@@ -103,12 +123,15 @@ export function Composer({ session, enabled, working, visible, user, meter, plac
       setDismissed(true);
     } else if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      if (commands.length) send(`/${commands[at].name}`);
+      if (commands.length && canSend) void send(`/${commands[at].name}`);
       else if (canSend) send(draft.trim());
     }
   }
 
-  return <div className="composer-wrap">
+  return <div className={`composer-wrap ${attachments.hovering ? 'file-hover' : ''}`}>
+    {attachments.hovering && <div className="attachment-hint">松开鼠标，将文件传入虚拟机并添加到这条消息</div>}
+    <AttachmentList jobs={attachments.jobs} onRemove={id => attachments.queue.remove(id)} onRetry={id => attachments.queue.retry(id)}/>
+    {(attachments.error || sendError) && <div className="attachment-error" role="alert">{attachments.error || sendError}</div>}
     <div className="composer">
       {commands.length > 0 && enabled && <div className="slash-menu" role="listbox" aria-label="命令" ref={menu}>
         {commands.map((command, index) => <button key={command.name} role="option" aria-selected={index === at} className={`slash-item ${index === at ? 'active' : ''}`}
@@ -117,9 +140,10 @@ export function Composer({ session, enabled, working, visible, user, meter, plac
           <code>/{command.name}</code><span>{command.description}</span>
         </button>)}
       </div>}
-      <textarea ref={textarea} aria-label="给 Claude 的消息" rows={1} value={draft} disabled={!enabled} placeholder={placeholder}
+      <button className="tool-button attach-button" aria-label="添加附件" title={`添加附件，支持多选或拖入；单文件最多 ${product.attachments.max_file_bytes / 1048576} MiB`} disabled={!enabled || sending || attachments.choosing} onClick={attachments.choose}><Paperclip size={18}/></button>
+      <textarea ref={textarea} aria-label="给 Claude 的消息" rows={1} value={draft} disabled={!enabled || sending} placeholder={placeholder}
         onChange={event => edit(event.target.value)} onKeyDown={keyed}/>
-      {working && !draft.trim()
+      {working && !draft.trim() && attachments.jobs.length === 0
         ? <button className="send stop" aria-label="停止" onClick={onStop}><Square size={14}/></button>
         : <button className="send" aria-label="发送" disabled={!canSend} onClick={() => send(draft.trim())}><ArrowUp size={17}/></button>}
     </div>

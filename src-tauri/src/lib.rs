@@ -1,3 +1,4 @@
+mod attachments;
 mod browser;
 mod clipboard;
 mod config;
@@ -148,6 +149,12 @@ async fn chat_open_link(address: String, app: tauri::AppHandle) -> Result<(), St
 #[tauri::command]
 fn chat_close(state: State<AppState>) { terminal::close(&state) }
 #[tauri::command]
+async fn import_attachment(id: String, path: String, progress: tauri::ipc::Channel<attachments::Progress>, app: tauri::AppHandle) -> Result<attachments::Attachment, String> {
+    tauri::async_runtime::spawn_blocking(move || attachments::upload(&app, id, path, progress)).await.map_err(|error| format!("上传任务异常结束：{error}"))?
+}
+#[tauri::command]
+fn cancel_attachment(id: String) { attachments::cancel(&id) }
+#[tauri::command]
 fn chat_send(text: String, app: tauri::AppHandle) -> Result<(), String> { terminal::send(&app, &text) }
 #[tauri::command]
 fn terminal_input(data: String, state: State<AppState>) -> Result<(), String> { terminal::input(&state, &data) }
@@ -248,7 +255,7 @@ pub fn run() {
                 }
             }
         })
-        .invoke_handler(tauri::generate_handler![inspect_host,select_storage_directory,select_asset_pack,download_image,set_host_access,set_software_rendering,import_subscription,current_state,start_install,start_vm,stop_vm,chat_open,chat_sessions,chat_open_link,chat_close,chat_send,terminal_input,terminal_resize,show_desktop,browser_open,browser_send,browser_resize,browser_close])
+        .invoke_handler(tauri::generate_handler![inspect_host,select_storage_directory,select_asset_pack,download_image,set_host_access,set_software_rendering,import_subscription,current_state,start_install,start_vm,stop_vm,chat_open,chat_sessions,chat_open_link,chat_close,chat_send,import_attachment,cancel_attachment,terminal_input,terminal_resize,show_desktop,browser_open,browser_send,browser_resize,browser_close])
         .build(tauri::generate_context!()).expect("could not start desktop application")
         .run(|app, event| {
             if let tauri::RunEvent::ExitRequested { api, .. } = event {

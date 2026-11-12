@@ -118,7 +118,8 @@ mod tests {
         let mut storage = Storage::load(original.clone()).unwrap();
         storage.select(&selected).unwrap();
         let reopened = Storage::load(original.clone()).unwrap();
-        assert_eq!(reopened.directory(), selected);
+        // Selection intentionally simplifies Windows verbatim path prefixes.
+        assert_eq!(reopened.directory(), dunce::simplified(&selected));
         assert!(selected.join("vm").is_dir());
         assert!(selected.join("omarchy-image").is_dir());
         assert!(!original.join("vm").exists());
@@ -127,7 +128,7 @@ mod tests {
         fs::write(selected.join("omarchy-image/retained.part"), b"existing download").unwrap();
         let next = directory(&root, "next-drive");
         storage.select(&next).unwrap();
-        assert_eq!(Storage::load(original).unwrap().directory(), next);
+        assert_eq!(Storage::load(original).unwrap().directory(), dunce::simplified(&next));
         assert_eq!(fs::read(selected.join("omarchy-image/retained.part")).unwrap(), b"existing download");
         assert!(!next.join("omarchy-image/retained.part").exists());
     }

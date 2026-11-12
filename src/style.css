@@ -58,6 +58,11 @@ main.chat-main{height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .composer-wrap{flex-shrink:0;padding:8px 24px 16px}
 .composer{max-width:780px;margin:0 auto;display:flex;align-items:flex-end;gap:10px;border:1px solid #cdd6bf;background:#fffefa;border-radius:14px;padding:10px 10px 10px 16px;box-shadow:0 2px 10px rgba(37,45,37,.06)}
 .composer:focus-within{border-color:#8fa66d}
+.attach-button{align-self:flex-end;min-width:34px;min-height:34px;justify-content:center;padding:6px}.composer textarea{min-width:0}
+.attachment-list{max-width:780px;margin:0 auto 8px;display:flex;flex-direction:column;gap:6px;max-height:180px;overflow-y:auto}
+.attachment-item{display:flex;align-items:center;gap:8px;border:1px solid #d3dac6;background:#fffefa;border-radius:8px;padding:8px 10px;color:#5d6d4c;font-size:12px}.attachment-item>svg{flex-shrink:0}
+.attachment-details{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.attachment-details strong{font-weight:550;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.attachment-details span{font-size:11px;overflow-wrap:anywhere}.attachment-details progress{width:100%;height:4px;accent-color:#678a37}
+.attachment-item.failed{border-color:#e4d6b0;color:#955e3c}.attachment-error,.attachment-hint{max-width:780px;margin:0 auto 8px;font-size:12px;color:#955e3c}.attachment-hint{color:#4d6141}.file-hover .composer{outline:2px dashed #678a37;outline-offset:3px}
 .composer textarea{flex:1;border:0;outline:0;resize:none;background:none;font:inherit;font-size:14px;line-height:1.6;max-height:180px;color:#252b23;padding:5px 0}.composer textarea:focus-visible{outline:0}
 .send{width:34px;height:34px;border-radius:50%;border:0;background:#33432d;color:#f1f6e9;display:grid;place-items:center;flex-shrink:0}.send:disabled{background:#c9cfbf;opacity:1}.send.stop{background:#955e3c}
 .composer-meta{max-width:780px;margin:8px auto 0;display:flex;gap:14px;font-size:11px;color:#949b89}.access{display:flex;align-items:center;gap:5px;color:#b07a2a}

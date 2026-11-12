@@ -61,11 +61,13 @@ pub struct BrowserConfig {
 #[derive(Clone, Deserialize, Serialize)]
 pub struct ClipboardConfig { pub poll_milliseconds: u64, pub max_bytes: usize }
 #[derive(Clone, Deserialize, Serialize)]
+pub struct AttachmentConfig { pub directory: String, pub max_file_bytes: u64, pub max_files: usize, pub chunk_bytes: usize, pub timeout_seconds: u64 }
+#[derive(Clone, Deserialize, Serialize)]
 pub struct DownloadConfig { pub user_agent: String, pub connect_timeout_seconds: u64, pub buffer_bytes: usize, pub report_milliseconds: u64 }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct ProductConfig {
     pub name: String, pub full_name: String, pub version: String, pub defaults: Resources, pub limits: Limits,
-    pub subscription: Subscription, pub download: DownloadConfig, pub clipboard: ClipboardConfig, pub host_access: HostAccessConfig, pub terminal: TerminalConfig, pub browser: BrowserConfig, pub vm: VmConfig, pub network: NetworkConfig, pub guest: Value, pub region: Value,
+    pub subscription: Subscription, pub download: DownloadConfig, pub clipboard: ClipboardConfig, pub attachments: AttachmentConfig, pub host_access: HostAccessConfig, pub terminal: TerminalConfig, pub browser: BrowserConfig, pub vm: VmConfig, pub network: NetworkConfig, pub guest: Value, pub region: Value,
 }
 impl ProductConfig {
     pub fn load() -> Self { serde_json::from_str(include_str!("../../product.config.json")).expect("product.config.json") }

@@ -262,6 +262,20 @@ fn runtime_log_tail(path: &Path) -> Result<String, io::Error> {
     Ok(lines.join("\n"))
 }
 
+fn smbios_credential(vm_dir: &Path, name: &str, content: &str) -> Result<String, String> {
+    let value = format!("io.systemd.credential.binary:{name}={}", STANDARD.encode(content));
+    #[cfg(windows)]
+    {
+        // The bootstrap alone can exceed CreateProcess's 32,767-character limit.
+        // QEMU's type=11,path reads the same OEM string from a file instead.
+        let path = vm_dir.join(format!("{name}.smbios"));
+        fs::write(&path, value).map_err(|e| format!("无法写入虚拟机启动数据：{e}"))?;
+        Ok(format!("type=11,path={}", path.to_string_lossy().replace(',', ",,")))
+    }
+    #[cfg(not(windows))]
+    { let _ = vm_dir; Ok(format!("type=11,value={value}")) }
+}
+
 pub fn boot(app: &AppHandle, run_id: u64, assets: AssetPack, data_dir: &Path, vm_dir: &Path, resources: Resources, network: Option<Value>) -> Result<(), String> {
     let state = app.state::<AppState>();
     let cfg = &state.config;
@@ -294,7 +308,7 @@ pub fn boot(app: &AppHandle, run_id: u64, assets: AssetPack, data_dir: &Path, vm
     let bootstrap = compressed.finish().map_err(|e| e.to_string())?;
     let unit = format!("[Unit]\nDescription=Omarchy Space Provisioning\nConditionPathExists=!/etc/initrd-release\nAfter=systemd-udev-settle.service\nWants=systemd-udev-settle.service\n[Service]\nType=oneshot\nExecStart=/usr/bin/python3 -c \"import base64,zlib;exec(zlib.decompress(base64.b64decode('{}')))\"\nTimeoutStartSec={}\nStandardOutput=null\nStandardError=null\n", STANDARD.encode(bootstrap), cfg.vm.provision_service_timeout);
     for (name, content) in [("systemd.extra-unit.omarchy-space-provision.service", unit.as_str()), ("systemd.unit-dropin.multi-user.target", "[Unit]\nWants=omarchy-space-provision.service\n")] {
-        arguments.extend(["-smbios".into(), format!("type=11,value=io.systemd.credential.binary:{name}={}", STANDARD.encode(content))]);
+        arguments.extend(["-smbios".into(), smbios_credential(vm_dir, name, content)?]);
     }
     update_run(app, run_id, "boot", if software.is_some() { "正在使用 CPU 兼容显示启动 Omarchy" } else { "正在启动 Omarchy" });
     let log = File::create(vm_dir.join("runtime.log")).map_err(|e| e.to_string())?;
@@ -542,6 +556,22 @@ pub fn initial_view(data_dir: &Path) -> View {
 mod qmp_tests {
     use super::*;
     use std::sync::mpsc;
+
+    #[cfg(windows)]
+    #[test]
+    fn windows_bootstrap_uses_short_file_argument_and_preserves_oem_string() {
+        let directory = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../evidence/smbios-tests/中文,space dir").join(uuid::Uuid::new_v4().to_string());
+        fs::create_dir_all(&directory).unwrap();
+        let content = "x".repeat(40000);
+        let argument = smbios_credential(&directory, "test-unit", &content).unwrap();
+        assert!(argument.starts_with("type=11,path="));
+        assert!(argument.len() < 1024);
+        assert!(argument.contains("中文,,space dir"));
+        let value = fs::read_to_string(directory.join("test-unit.smbios")).unwrap();
+        let encoded = value.strip_prefix("io.systemd.credential.binary:test-unit=").unwrap();
+        assert_eq!(STANDARD.decode(encoded).unwrap(), content.as_bytes());
+    }
 
     fn exchange(reply: &'static str) -> Result<Value, String> {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();

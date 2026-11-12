@@ -76,10 +76,21 @@ def prepare():
     out.flush()
 
 
+def api_configured():
+    env = dict(os.environ)
+    user = read_json(os.path.join(home, cfg["claude_user_settings_path"]))
+    for settings in (user, cfg.get("claude_settings", {})):
+        values = settings.get("env", {}) if isinstance(settings, dict) else {}
+        if isinstance(values, dict):
+            env.update(values)
+    return any(isinstance(env.get(key), str) and bool(env[key].strip())
+               for key in ("ANTHROPIC_AUTH_TOKEN", "ANTHROPIC_API_KEY"))
+
+
 def status():
     state = read_json(os.path.join(home, cfg["claude_state_path"]))
     project = state.get("projects", {}).get(cwd, {})
-    return {"signed_in": os.path.isfile(os.path.join(home, cfg["claude_credentials_path"])),
+    return {"signed_in": os.path.isfile(os.path.join(home, cfg["claude_credentials_path"])) or api_configured(),
             "onboarded": state.get("hasCompletedOnboarding") is True,
             "trusted": project.get("hasTrustDialogAccepted") is True}
 

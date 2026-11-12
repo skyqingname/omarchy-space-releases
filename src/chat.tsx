@@ -95,11 +95,13 @@ export function ChatPane({ visible, user, alert, onBrowser }: { visible: boolean
     activity.current = state.activity;
   }, [state.activity]);
 
-  function send(text: string) {
+  async function send(text: string) {
     // These open a dialog in the TUI, which is answered there and may record nothing.
     const dialog = opensDialog(text, product.chat.slash_commands);
+    const current = generation.current;
+    await invoke('chat_send', { text });
+    if (generation.current !== current) return;
     if (!dialog) dispatch({ type: 'send', text, now: Date.now() });
-    invoke('chat_send', { text }).catch(reason => setError(String(reason)));
     if (dialog) setMode('terminal');
   }
   function interrupt() {
@@ -135,7 +137,7 @@ export function ChatPane({ visible, user, alert, onBrowser }: { visible: boolean
         <Transcript state={state} talk={talk} phase={phase} now={now} onTerminal={toTerminal} onAnswer={answer} onLink={openLink}>
           {state.exited && <div className="chat-ended"><span>Claude 已退出。</span><button className="secondary" onClick={() => connect({})}><RotateCcw size={15}/>继续这次对话</button><button className="secondary" onClick={() => connect({ fresh: true })}><Plus size={15}/>新对话</button></div>}
         </Transcript>
-        <Composer session={state.session} enabled={!state.exited && ready && state.session !== ''} working={phase === 'working'} visible={visible} user={user} meter={state.meter}
+        <Composer session={state.session} enabled={!state.exited && ready && state.session !== ''} working={phase === 'working'} visible={visible && mode === 'chat'} user={user} meter={state.meter}
           placeholder={!signedIn ? '先在终端里完成 Claude 登录' : !ready ? '先在终端里信任这个工作目录' : '输入要 Claude 做的事，Enter 发送，Shift + Enter 换行；/ 使用命令'}
           onSend={send} onStop={interrupt}/>
       </div>
