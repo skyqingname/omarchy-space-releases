@@ -1,0 +1,17 @@
+{
+  "platform": "macos-aarch64",
+  "runtime_source": "/path/to/Try Omarchy.app/Contents/Resources/runtime",
+  "firmware_source": "/path/to/Try Omarchy.app/Contents/Resources/firmware",
+  "sing_box_source": "/path/to/sing-box.pkg.tar.zst",
+  "destination": "src-tauri/resources/runtime-pack",
+  "notices": [
+    {
+      "source": "/path/to/Try Omarchy.app/Contents/Resources/LICENSE",
+      "destination": "LICENSE.try-omarchy"
+    },
+    {
+      "source": "/path/to/Try Omarchy.app/Contents/Resources/Credits.rtf",
+      "destination": "Credits.try-omarchy.rtf"
+    }
+  ]
+}

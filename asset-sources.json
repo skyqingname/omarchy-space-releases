@@ -1,0 +1,13 @@
+{
+  "parallel_downloads": 3,
+  "download_timeout_seconds": 1800,
+  "windows-x86_64": {
+    "destination": "assets/windows-x86_64",
+    "files": {
+      "sing-box.pkg.tar.zst": "https://github.com/SagerNet/sing-box/releases/download/v1.14.4/sing-box_1.14.4_linux_x86_64.pkg.tar.zst",
+      "downloads/zstd.zip": "https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-v1.5.7-win64.zip",
+      "downloads/winq-runtime.zip": "https://github.com/omacom/try-omarchy-windows/releases/download/v0.13.0/winq-emu-alpha10-portable.zip",
+      "LICENSE.omarchy": "https://github.com/omacom/try-omarchy-windows/releases/download/v0.13.0/LICENSE.omarchy"
+    }
+  }
+}

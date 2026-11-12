@@ -1,0 +1,1238 @@
+{
+  "name": "GoToCS",
+  "full_name": "Go to Claude Space",
+  "version": "0.1.0",
+  "defaults": {
+    "cpus": 4,
+    "memory_mib": 6144,
+    "disk_gib": 64
+  },
+  "limits": {
+    "min_cpus": 2,
+    "min_memory_mib": 4096,
+    "max_memory_mib": 32768,
+    "host_memory_mib": 2048,
+    "min_free_disk_gib": 20,
+    "max_disk_gib": 512
+  },
+  "subscription": {
+    "timeout_seconds": 30,
+    "user_agent": "GoToCS/0.1 sing-box"
+  },
+  "clipboard": {
+    "poll_milliseconds": 500,
+    "max_bytes": 1048576
+  },
+  "host_access": {
+    "address": "10.0.2.2",
+    "port": 22,
+    "alias": "host",
+    "key_comment": "omarchy-space-host",
+    "key_options": "from=\"127.0.0.1,::1\",no-agent-forwarding,no-port-forwarding,no-X11-forwarding",
+    "check_timeout_seconds": 2
+  },
+  "terminal": {
+    "guest_port": 22,
+    "forward_address": "127.0.0.1",
+    "ssh_service": "sshd",
+    "host_key_alias": "gotocs-vm",
+    "key_name": "terminal_ed25519",
+    "key_comment": "gotocs-terminal",
+    "authorized_keys_marker": "gotocs-terminal",
+    "known_hosts_name": "terminal_known_hosts",
+    "session_record_name": "chat.json",
+    "follow_log_name": "chat-follow.log",
+    "ssh_options": [
+      "-F",
+      "none",
+      "-o",
+      "BatchMode=yes",
+      "-o",
+      "IdentitiesOnly=yes",
+      "-o",
+      "StrictHostKeyChecking=accept-new",
+      "-o",
+      "ServerAliveInterval=30",
+      "-o",
+      "LogLevel=ERROR"
+    ],
+    "term": "xterm-256color",
+    "working_directory": "workspace",
+    "claude_arguments": [
+      "--dangerously-skip-permissions"
+    ],
+    "claude_settings": {
+      "skipDangerousModePermissionPrompt": true
+    },
+    "claude_projects_path": ".claude/projects",
+    "claude_credentials_path": ".claude/.credentials.json",
+    "claude_state_path": ".claude.json",
+    "claude_user_settings_path": ".claude/settings.json",
+    "runtime_directory": ".cache/gotocs",
+    "settings_name": "settings.json",
+    "hooks_name": "hooks.jsonl",
+    "meter_name": "status.json",
+    "hook_events": [
+      "SessionStart",
+      "UserPromptSubmit",
+      "PermissionRequest",
+      "PostToolUse",
+      "PostToolUseFailure",
+      "Notification",
+      "Stop"
+    ],
+    "hook_fields": [
+      "hook_event_name",
+      "session_id",
+      "notification_type",
+      "tool_name",
+      "source"
+    ],
+    "meter_fields": [
+      "model",
+      "effort",
+      "context_window",
+      "rate_limits"
+    ],
+    "record_types": [
+      "user",
+      "assistant",
+      "system",
+      "queue-operation",
+      "ai-title",
+      "attachment"
+    ],
+    "attachment_types": [
+      "queued_command"
+    ],
+    "skipped_system_subtypes": [
+      "stop_hook_summary"
+    ],
+    "link_schemes": [
+      "http",
+      "https"
+    ],
+    "link_command": "xdg-open",
+    "read_chunk_bytes": 1048576,
+    "history_limit": 40,
+    "history_title_chars": 80,
+    "follow_poll_seconds": 0.2,
+    "status_poll_seconds": 1,
+    "submit_delay_milliseconds": 500,
+    "read_buffer_bytes": 8192,
+    "output_gather_milliseconds": 5,
+    "output_gather_bytes": 16384,
+    "tool_output_max_chars": 4000,
+    "tool_summary_max_chars": 300
+  },
+  "chat": {
+    "silent_seconds": 60,
+    "tick_milliseconds": 1000,
+    "draft_storage_key": "gotocs-drafts",
+    "draft_save_milliseconds": 300,
+    "scroll_end_pixels": 40,
+    "copy_feedback_milliseconds": 2000,
+    "question_options_max": 9,
+    "context_high_percentage": 70,
+    "context_full_percentage": 90,
+    "slash_commands": [
+      {"name": "compact", "description": "压缩上下文，腾出空间继续聊", "terminal": false},
+      {"name": "clear", "description": "清空上下文，从头开始", "terminal": false},
+      {"name": "init", "description": "为工作目录写一份 CLAUDE.md", "terminal": false},
+      {"name": "review", "description": "审查代码改动", "terminal": false},
+      {"name": "context", "description": "查看上下文占用", "terminal": true},
+      {"name": "usage", "description": "查看用量与额度", "terminal": true},
+      {"name": "model", "description": "切换模型", "terminal": true},
+      {"name": "effort", "description": "调整思考强度", "terminal": true},
+      {"name": "memory", "description": "编辑记忆文件", "terminal": true},
+      {"name": "mcp", "description": "管理 MCP 服务", "terminal": true},
+      {"name": "login", "description": "登录或切换 Claude 账号", "terminal": true}
+    ]
+  },
+  "browser": {
+    "package": "wayvnc",
+    "output": "GOTOCS-BROWSER",
+    "guest_port": 5901,
+    "window_class": "chromium",
+    "launch_command": "omarchy-launch-browser",
+    "refresh_rate": 60,
+    "max_fps": 30,
+    "poll_seconds": 0.5,
+    "relaunch_seconds": 5,
+    "ready_timeout_seconds": 30,
+    "log_name": "browser-stream.log",
+    "read_buffer_bytes": 262144,
+    "initial_width": 1280,
+    "initial_height": 800,
+    "resize_debounce_milliseconds": 300,
+    "quality_level": 6,
+    "compression_level": 2
+  },
+  "download": {
+    "user_agent": "GoToCS/0.1",
+    "connect_timeout_seconds": 30,
+    "buffer_bytes": 1048576,
+    "report_milliseconds": 500
+  },
+  "vm": {
+    "zstd_memory_mib": 256,
+    "provision_port_name": "dev.omarchy.space.provision",
+    "clipboard_port_name": "dev.omarchy.space.clipboard",
+    "boot_timeout_seconds": 240,
+    "provision_timeout_seconds": 1800,
+    "shutdown_timeout_seconds": 90,
+    "shutdown_retry_seconds": 5,
+    "status_poll_milliseconds": 1000,
+    "provision_service_timeout": "infinity",
+    "desktop_poll_milliseconds": 100
+  },
+  "network": {
+    "dns_server": "1.1.1.1",
+    "bootstrap_dns": "1.1.1.1",
+    "mixed_port": 2080,
+    "dns_strategy": "ipv4_only",
+    "tun_interface": "omarchy0",
+    "tun_addresses": [
+      "172.19.0.1/30",
+      "fdfe:dcba:9876::1/126"
+    ],
+    "probe_url": "https://www.cloudflare.com/cdn-cgi/trace",
+    "probe_timeout_seconds": 30,
+    "probe_attempts": 3,
+    "probe_retry_seconds": 1,
+    "startup_timeout_seconds": 30,
+    "startup_poll_seconds": 0.2,
+    "guard": {
+      "version": 2,
+      "table": "omarchy_space_guard",
+      "service_name": "omarchy-space-guard",
+      "service_user": "omarchy-space-net",
+      "rules_path": "/etc/omarchy-space/network-guard.nft",
+      "restart_seconds": 2,
+      "blocked_destination_cidrs": [
+        "0.0.0.0/8",
+        "10.0.0.0/8",
+        "100.64.0.0/10",
+        "127.0.0.0/8",
+        "169.254.0.0/16",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+        "224.0.0.0/4",
+        "240.0.0.0/4",
+        "::/128",
+        "::1/128",
+        "fc00::/7",
+        "fe80::/10",
+        "ff00::/8",
+        "fec0::/10"
+      ],
+      "dhcp_server": "10.0.2.2",
+      "reconnect_hook_path": "/etc/NetworkManager/dispatcher.d/20-omarchy-space-proxy",
+      "dns_helper_path": "/usr/lib/omarchy-space/configure-proxy-dns.py",
+      "configuration_lock_path": "/run/omarchy-space-network.lock"
+    },
+    "tun_stack": "gvisor"
+  },
+  "guest": {
+    "service_name": "omarchy-space-network",
+    "credential_name": "singbox.json",
+    "state_directory": "/var/lib/omarchy-space",
+    "credential_directory": "/etc/credstore.encrypted",
+    "owner_uid": 1000,
+    "owner_pending_path": "/var/lib/omarchy/provisioning/pending",
+    "owner_wait_seconds": null,
+    "owner_poll_seconds": 2,
+    "default_agent_path": ".config/omarchy/defaults/agent",
+    "owner_heartbeat_seconds": 30,
+    "command_timeout_seconds": 120,
+    "clipboard": {
+      "service_name": "omarchy-space-clipboard",
+      "receiver_path": "/usr/lib/omarchy-space/clipboard-receiver.py",
+      "restart_seconds": 2,
+      "session_poll_seconds": 1
+    },
+    "claude_path": ".local/bin/claude",
+    "claude_installer": {
+      "url": "https://claude.ai/install.sh",
+      "attempts": 3,
+      "retry_seconds": 5,
+      "timeout_seconds": 600
+    }
+  },
+  "region": {
+    "policy": "measured_selected_exit",
+    "apply_on": [
+      "install",
+      "network_reconfigure"
+    ],
+    "timezone_mode": "fixed",
+    "geolocation": {
+      "url_template": "https://ipapi.co/{ip}/json/",
+      "timeout_seconds": 30,
+      "attempts": 3,
+      "retry_seconds": 3,
+      "user_agent": "GoToCS/0.1",
+      "fields": {
+        "ip": "ip",
+        "country": "country_code",
+        "subdivision": "region_code",
+        "timezone": "timezone"
+      }
+    },
+    "country_profiles": {
+      "US": {
+        "locale": "en_US.UTF-8",
+        "browser_language": "en-US",
+        "preferred_languages": [
+          "en-US",
+          "en"
+        ]
+      },
+      "GB": {
+        "locale": "en_GB.UTF-8",
+        "browser_language": "en-GB",
+        "preferred_languages": [
+          "en-GB",
+          "en"
+        ]
+      },
+      "CA": {
+        "locale": "en_CA.UTF-8",
+        "browser_language": "en-CA",
+        "preferred_languages": [
+          "en-CA",
+          "en"
+        ]
+      },
+      "AU": {
+        "locale": "en_AU.UTF-8",
+        "browser_language": "en-AU",
+        "preferred_languages": [
+          "en-AU",
+          "en"
+        ]
+      },
+      "NZ": {
+        "locale": "en_NZ.UTF-8",
+        "browser_language": "en-NZ",
+        "preferred_languages": [
+          "en-NZ",
+          "en"
+        ]
+      },
+      "IE": {
+        "locale": "en_IE.UTF-8",
+        "browser_language": "en-IE",
+        "preferred_languages": [
+          "en-IE",
+          "en"
+        ]
+      },
+      "SG": {
+        "locale": "en_SG.UTF-8",
+        "browser_language": "en-SG",
+        "preferred_languages": [
+          "en-SG",
+          "en"
+        ]
+      },
+      "JP": {
+        "locale": "ja_JP.UTF-8",
+        "browser_language": "ja-JP",
+        "preferred_languages": [
+          "ja-JP",
+          "ja"
+        ]
+      },
+      "KR": {
+        "locale": "ko_KR.UTF-8",
+        "browser_language": "ko-KR",
+        "preferred_languages": [
+          "ko-KR",
+          "ko"
+        ]
+      },
+      "CN": {
+        "locale": "zh_CN.UTF-8",
+        "browser_language": "zh-CN",
+        "preferred_languages": [
+          "zh-CN",
+          "zh"
+        ]
+      },
+      "HK": {
+        "locale": "zh_HK.UTF-8",
+        "browser_language": "zh-TW",
+        "preferred_languages": [
+          "zh-HK",
+          "zh-TW",
+          "zh"
+        ]
+      },
+      "TW": {
+        "locale": "zh_TW.UTF-8",
+        "browser_language": "zh-TW",
+        "preferred_languages": [
+          "zh-TW",
+          "zh"
+        ]
+      },
+      "DE": {
+        "locale": "de_DE.UTF-8",
+        "browser_language": "de-DE",
+        "preferred_languages": [
+          "de-DE",
+          "de"
+        ]
+      },
+      "AT": {
+        "locale": "de_AT.UTF-8",
+        "browser_language": "de-AT",
+        "preferred_languages": [
+          "de-AT",
+          "de"
+        ]
+      },
+      "CH": {
+        "locale": "de_CH.UTF-8",
+        "browser_language": "de-CH",
+        "preferred_languages": [
+          "de-CH",
+          "de"
+        ]
+      },
+      "FR": {
+        "locale": "fr_FR.UTF-8",
+        "browser_language": "fr-FR",
+        "preferred_languages": [
+          "fr-FR",
+          "fr"
+        ]
+      },
+      "BE": {
+        "locale": "nl_BE.UTF-8",
+        "browser_language": "nl-BE",
+        "preferred_languages": [
+          "nl-BE",
+          "nl"
+        ]
+      },
+      "NL": {
+        "locale": "nl_NL.UTF-8",
+        "browser_language": "nl-NL",
+        "preferred_languages": [
+          "nl-NL",
+          "nl"
+        ]
+      },
+      "LU": {
+        "locale": "fr_LU.UTF-8",
+        "browser_language": "fr-LU",
+        "preferred_languages": [
+          "fr-LU",
+          "fr"
+        ]
+      },
+      "IT": {
+        "locale": "it_IT.UTF-8",
+        "browser_language": "it-IT",
+        "preferred_languages": [
+          "it-IT",
+          "it"
+        ]
+      },
+      "ES": {
+        "locale": "es_ES.UTF-8",
+        "browser_language": "es-ES",
+        "preferred_languages": [
+          "es-ES",
+          "es"
+        ]
+      },
+      "PT": {
+        "locale": "pt_PT.UTF-8",
+        "browser_language": "pt-PT",
+        "preferred_languages": [
+          "pt-PT",
+          "pt"
+        ]
+      },
+      "DK": {
+        "locale": "da_DK.UTF-8",
+        "browser_language": "da-DK",
+        "preferred_languages": [
+          "da-DK",
+          "da"
+        ]
+      },
+      "SE": {
+        "locale": "sv_SE.UTF-8",
+        "browser_language": "sv-SE",
+        "preferred_languages": [
+          "sv-SE",
+          "sv"
+        ]
+      },
+      "NO": {
+        "locale": "nb_NO.UTF-8",
+        "browser_language": "nb-NO",
+        "preferred_languages": [
+          "nb-NO",
+          "nb"
+        ]
+      },
+      "FI": {
+        "locale": "fi_FI.UTF-8",
+        "browser_language": "fi-FI",
+        "preferred_languages": [
+          "fi-FI",
+          "fi"
+        ]
+      },
+      "IS": {
+        "locale": "is_IS.UTF-8",
+        "browser_language": "is-IS",
+        "preferred_languages": [
+          "is-IS",
+          "is"
+        ]
+      },
+      "PL": {
+        "locale": "pl_PL.UTF-8",
+        "browser_language": "pl-PL",
+        "preferred_languages": [
+          "pl-PL",
+          "pl"
+        ]
+      },
+      "CZ": {
+        "locale": "cs_CZ.UTF-8",
+        "browser_language": "cs-CZ",
+        "preferred_languages": [
+          "cs-CZ",
+          "cs"
+        ]
+      },
+      "SK": {
+        "locale": "sk_SK.UTF-8",
+        "browser_language": "sk-SK",
+        "preferred_languages": [
+          "sk-SK",
+          "sk"
+        ]
+      },
+      "HU": {
+        "locale": "hu_HU.UTF-8",
+        "browser_language": "hu-HU",
+        "preferred_languages": [
+          "hu-HU",
+          "hu"
+        ]
+      },
+      "RO": {
+        "locale": "ro_RO.UTF-8",
+        "browser_language": "ro-RO",
+        "preferred_languages": [
+          "ro-RO",
+          "ro"
+        ]
+      },
+      "BG": {
+        "locale": "bg_BG.UTF-8",
+        "browser_language": "bg-BG",
+        "preferred_languages": [
+          "bg-BG",
+          "bg"
+        ]
+      },
+      "GR": {
+        "locale": "el_GR.UTF-8",
+        "browser_language": "el-GR",
+        "preferred_languages": [
+          "el-GR",
+          "el"
+        ]
+      },
+      "HR": {
+        "locale": "hr_HR.UTF-8",
+        "browser_language": "hr-HR",
+        "preferred_languages": [
+          "hr-HR",
+          "hr"
+        ]
+      },
+      "SI": {
+        "locale": "sl_SI.UTF-8",
+        "browser_language": "sl-SI",
+        "preferred_languages": [
+          "sl-SI",
+          "sl"
+        ]
+      },
+      "RS": {
+        "locale": "sr_RS.UTF-8",
+        "browser_language": "sr-RS",
+        "preferred_languages": [
+          "sr-RS",
+          "sr"
+        ]
+      },
+      "BA": {
+        "locale": "bs_BA.UTF-8",
+        "browser_language": "bs-BA",
+        "preferred_languages": [
+          "bs-BA",
+          "bs"
+        ]
+      },
+      "EE": {
+        "locale": "et_EE.UTF-8",
+        "browser_language": "et-EE",
+        "preferred_languages": [
+          "et-EE",
+          "et"
+        ]
+      },
+      "LV": {
+        "locale": "lv_LV.UTF-8",
+        "browser_language": "lv-LV",
+        "preferred_languages": [
+          "lv-LV",
+          "lv"
+        ]
+      },
+      "LT": {
+        "locale": "lt_LT.UTF-8",
+        "browser_language": "lt-LT",
+        "preferred_languages": [
+          "lt-LT",
+          "lt"
+        ]
+      },
+      "UA": {
+        "locale": "uk_UA.UTF-8",
+        "browser_language": "uk-UA",
+        "preferred_languages": [
+          "uk-UA",
+          "uk"
+        ]
+      },
+      "RU": {
+        "locale": "ru_RU.UTF-8",
+        "browser_language": "ru-RU",
+        "preferred_languages": [
+          "ru-RU",
+          "ru"
+        ]
+      },
+      "BY": {
+        "locale": "be_BY.UTF-8",
+        "browser_language": "be-BY",
+        "preferred_languages": [
+          "be-BY",
+          "be"
+        ]
+      },
+      "TR": {
+        "locale": "tr_TR.UTF-8",
+        "browser_language": "tr-TR",
+        "preferred_languages": [
+          "tr-TR",
+          "tr"
+        ]
+      },
+      "GE": {
+        "locale": "ka_GE.UTF-8",
+        "browser_language": "ka-GE",
+        "preferred_languages": [
+          "ka-GE",
+          "ka"
+        ]
+      },
+      "AM": {
+        "locale": "hy_AM.UTF-8",
+        "browser_language": "hy-AM",
+        "preferred_languages": [
+          "hy-AM",
+          "hy"
+        ]
+      },
+      "AZ": {
+        "locale": "az_AZ.UTF-8",
+        "browser_language": "az-AZ",
+        "preferred_languages": [
+          "az-AZ",
+          "az"
+        ]
+      },
+      "KZ": {
+        "locale": "kk_KZ.UTF-8",
+        "browser_language": "kk-KZ",
+        "preferred_languages": [
+          "kk-KZ",
+          "kk"
+        ]
+      },
+      "UZ": {
+        "locale": "uz_UZ.UTF-8",
+        "browser_language": "uz-UZ",
+        "preferred_languages": [
+          "uz-UZ",
+          "uz"
+        ]
+      },
+      "IL": {
+        "locale": "he_IL.UTF-8",
+        "browser_language": "he-IL",
+        "preferred_languages": [
+          "he-IL",
+          "he"
+        ]
+      },
+      "AE": {
+        "locale": "ar_AE.UTF-8",
+        "browser_language": "ar-AE",
+        "preferred_languages": [
+          "ar-AE",
+          "ar"
+        ]
+      },
+      "SA": {
+        "locale": "ar_SA.UTF-8",
+        "browser_language": "ar-SA",
+        "preferred_languages": [
+          "ar-SA",
+          "ar"
+        ]
+      },
+      "QA": {
+        "locale": "ar_QA.UTF-8",
+        "browser_language": "ar-QA",
+        "preferred_languages": [
+          "ar-QA",
+          "ar"
+        ]
+      },
+      "KW": {
+        "locale": "ar_KW.UTF-8",
+        "browser_language": "ar-KW",
+        "preferred_languages": [
+          "ar-KW",
+          "ar"
+        ]
+      },
+      "BH": {
+        "locale": "ar_BH.UTF-8",
+        "browser_language": "ar-BH",
+        "preferred_languages": [
+          "ar-BH",
+          "ar"
+        ]
+      },
+      "OM": {
+        "locale": "ar_OM.UTF-8",
+        "browser_language": "ar-OM",
+        "preferred_languages": [
+          "ar-OM",
+          "ar"
+        ]
+      },
+      "JO": {
+        "locale": "ar_JO.UTF-8",
+        "browser_language": "ar-JO",
+        "preferred_languages": [
+          "ar-JO",
+          "ar"
+        ]
+      },
+      "LB": {
+        "locale": "ar_LB.UTF-8",
+        "browser_language": "ar-LB",
+        "preferred_languages": [
+          "ar-LB",
+          "ar"
+        ]
+      },
+      "EG": {
+        "locale": "ar_EG.UTF-8",
+        "browser_language": "ar-EG",
+        "preferred_languages": [
+          "ar-EG",
+          "ar"
+        ]
+      },
+      "MA": {
+        "locale": "ar_MA.UTF-8",
+        "browser_language": "ar-MA",
+        "preferred_languages": [
+          "ar-MA",
+          "ar"
+        ]
+      },
+      "DZ": {
+        "locale": "ar_DZ.UTF-8",
+        "browser_language": "ar-DZ",
+        "preferred_languages": [
+          "ar-DZ",
+          "ar"
+        ]
+      },
+      "TN": {
+        "locale": "ar_TN.UTF-8",
+        "browser_language": "ar-TN",
+        "preferred_languages": [
+          "ar-TN",
+          "ar"
+        ]
+      },
+      "ZA": {
+        "locale": "en_ZA.UTF-8",
+        "browser_language": "en-ZA",
+        "preferred_languages": [
+          "en-ZA",
+          "en"
+        ]
+      },
+      "NG": {
+        "locale": "en_NG.UTF-8",
+        "browser_language": "en-NG",
+        "preferred_languages": [
+          "en-NG",
+          "en"
+        ]
+      },
+      "KE": {
+        "locale": "sw_KE.UTF-8",
+        "browser_language": "sw-KE",
+        "preferred_languages": [
+          "sw-KE",
+          "sw"
+        ]
+      },
+      "IN": {
+        "locale": "hi_IN.UTF-8",
+        "browser_language": "hi-IN",
+        "preferred_languages": [
+          "hi-IN",
+          "hi"
+        ]
+      },
+      "PK": {
+        "locale": "ur_PK.UTF-8",
+        "browser_language": "ur-PK",
+        "preferred_languages": [
+          "ur-PK",
+          "ur"
+        ]
+      },
+      "BD": {
+        "locale": "bn_BD.UTF-8",
+        "browser_language": "bn-BD",
+        "preferred_languages": [
+          "bn-BD",
+          "bn"
+        ]
+      },
+      "LK": {
+        "locale": "si_LK.UTF-8",
+        "browser_language": "si-LK",
+        "preferred_languages": [
+          "si-LK",
+          "si"
+        ]
+      },
+      "NP": {
+        "locale": "ne_NP.UTF-8",
+        "browser_language": "ne-NP",
+        "preferred_languages": [
+          "ne-NP",
+          "ne"
+        ]
+      },
+      "TH": {
+        "locale": "th_TH.UTF-8",
+        "browser_language": "th-TH",
+        "preferred_languages": [
+          "th-TH",
+          "th"
+        ]
+      },
+      "VN": {
+        "locale": "vi_VN.UTF-8",
+        "browser_language": "vi-VN",
+        "preferred_languages": [
+          "vi-VN",
+          "vi"
+        ]
+      },
+      "ID": {
+        "locale": "id_ID.UTF-8",
+        "browser_language": "id-ID",
+        "preferred_languages": [
+          "id-ID",
+          "id"
+        ]
+      },
+      "MY": {
+        "locale": "ms_MY.UTF-8",
+        "browser_language": "ms-MY",
+        "preferred_languages": [
+          "ms-MY",
+          "ms"
+        ]
+      },
+      "PH": {
+        "locale": "fil_PH.UTF-8",
+        "browser_language": "fil-PH",
+        "preferred_languages": [
+          "fil-PH",
+          "fil"
+        ]
+      },
+      "BR": {
+        "locale": "pt_BR.UTF-8",
+        "browser_language": "pt-BR",
+        "preferred_languages": [
+          "pt-BR",
+          "pt"
+        ]
+      },
+      "AR": {
+        "locale": "es_AR.UTF-8",
+        "browser_language": "es-AR",
+        "preferred_languages": [
+          "es-AR",
+          "es"
+        ]
+      },
+      "CL": {
+        "locale": "es_CL.UTF-8",
+        "browser_language": "es-CL",
+        "preferred_languages": [
+          "es-CL",
+          "es"
+        ]
+      },
+      "CO": {
+        "locale": "es_CO.UTF-8",
+        "browser_language": "es-CO",
+        "preferred_languages": [
+          "es-CO",
+          "es"
+        ]
+      },
+      "PE": {
+        "locale": "es_PE.UTF-8",
+        "browser_language": "es-PE",
+        "preferred_languages": [
+          "es-PE",
+          "es"
+        ]
+      },
+      "MX": {
+        "locale": "es_MX.UTF-8",
+        "browser_language": "es-MX",
+        "preferred_languages": [
+          "es-MX",
+          "es"
+        ]
+      },
+      "UY": {
+        "locale": "es_UY.UTF-8",
+        "browser_language": "es-UY",
+        "preferred_languages": [
+          "es-UY",
+          "es"
+        ]
+      },
+      "EC": {
+        "locale": "es_EC.UTF-8",
+        "browser_language": "es-EC",
+        "preferred_languages": [
+          "es-EC",
+          "es"
+        ]
+      },
+      "VE": {
+        "locale": "es_VE.UTF-8",
+        "browser_language": "es-VE",
+        "preferred_languages": [
+          "es-VE",
+          "es"
+        ]
+      },
+      "CR": {
+        "locale": "es_CR.UTF-8",
+        "browser_language": "es-CR",
+        "preferred_languages": [
+          "es-CR",
+          "es"
+        ]
+      },
+      "PA": {
+        "locale": "es_PA.UTF-8",
+        "browser_language": "es-PA",
+        "preferred_languages": [
+          "es-PA",
+          "es"
+        ]
+      },
+      "DO": {
+        "locale": "es_DO.UTF-8",
+        "browser_language": "es-DO",
+        "preferred_languages": [
+          "es-DO",
+          "es"
+        ]
+      },
+      "PR": {
+        "locale": "es_PR.UTF-8",
+        "browser_language": "es-PR",
+        "preferred_languages": [
+          "es-PR",
+          "es"
+        ]
+      }
+    },
+    "subdivision_profiles": {
+      "CA:QC": {
+        "locale": "fr_CA.UTF-8",
+        "browser_language": "fr-CA",
+        "preferred_languages": [
+          "fr-CA",
+          "fr"
+        ]
+      },
+      "CH:GE": {
+        "locale": "fr_CH.UTF-8",
+        "browser_language": "fr-CH",
+        "preferred_languages": [
+          "fr-CH",
+          "fr"
+        ]
+      },
+      "CH:VD": {
+        "locale": "fr_CH.UTF-8",
+        "browser_language": "fr-CH",
+        "preferred_languages": [
+          "fr-CH",
+          "fr"
+        ]
+      },
+      "CH:NE": {
+        "locale": "fr_CH.UTF-8",
+        "browser_language": "fr-CH",
+        "preferred_languages": [
+          "fr-CH",
+          "fr"
+        ]
+      },
+      "CH:JU": {
+        "locale": "fr_CH.UTF-8",
+        "browser_language": "fr-CH",
+        "preferred_languages": [
+          "fr-CH",
+          "fr"
+        ]
+      },
+      "CH:TI": {
+        "locale": "it_CH.UTF-8",
+        "browser_language": "it-CH",
+        "preferred_languages": [
+          "it-CH",
+          "it"
+        ]
+      }
+    },
+    "locale_categories": [
+      "LANG",
+      "LC_CTYPE",
+      "LC_NUMERIC",
+      "LC_TIME",
+      "LC_COLLATE",
+      "LC_MONETARY",
+      "LC_MESSAGES",
+      "LC_PAPER",
+      "LC_NAME",
+      "LC_ADDRESS",
+      "LC_TELEPHONE",
+      "LC_MEASUREMENT",
+      "LC_IDENTIFICATION"
+    ],
+    "locale_gen_path": "/etc/locale.gen",
+    "locale_conf_path": "/etc/locale.conf",
+    "user_locale_path": ".config/environment.d/60-omarchy-space-locale.conf",
+    "boot_id_path": "/proc/sys/kernel/random/boot_id",
+    "timezone_adapters": {
+      "aarch64": {
+        "set_command": [
+          "/usr/bin/try-omarchy-timezone",
+          "--select",
+          "{timezone}"
+        ],
+        "mode_command": [
+          "/usr/bin/try-omarchy-timezone",
+          "--mode"
+        ],
+        "state_files": [
+          "/var/lib/try-omarchy/timezone.json"
+        ]
+      },
+      "x86_64": {
+        "set_command": [
+          "/usr/bin/timedatectl",
+          "set-timezone",
+          "{timezone}"
+        ],
+        "mode_command": null,
+        "state_files": []
+      }
+    },
+    "browser": {
+      "process_name": "chromium",
+      "flags_path": "/etc/chromium-flags.conf",
+      "config_directory": ".config/chromium",
+      "preferences_glob": "*/Preferences",
+      "initial_profile": "Default",
+      "shutdown_timeout_seconds": 20,
+      "poll_seconds": 0.5
+    }
+  },
+  "shortcuts": {
+    "note": {
+      "macos-aarch64": "先点一下 Omarchy 窗口，让键盘进入虚拟机，再按下面的组合键。鼠标被窗口抓住时，按 ⌃ ⌥ G 还给 Mac。",
+      "windows-x86_64": "先点一下 Omarchy 窗口，让键盘进入虚拟机，再按下面的组合键。"
+    },
+    "keys": {
+      "macos-aarch64": {
+        "SUPER": "⌘ Command",
+        "SHIFT": "⇧ Shift",
+        "ALT": "⌥ Option",
+        "CTRL": "⌃ Control",
+        "RETURN": "Return"
+      },
+      "windows-x86_64": {
+        "SUPER": "Win",
+        "SHIFT": "Shift",
+        "ALT": "Alt",
+        "CTRL": "Ctrl",
+        "RETURN": "Enter"
+      }
+    },
+    "groups": [
+      {
+        "title": "打开应用",
+        "items": [
+          {
+            "action": "打开终端",
+            "keys": [
+              "SUPER",
+              "RETURN"
+            ]
+          },
+          {
+            "action": "打开浏览器",
+            "keys": [
+              "SUPER",
+              "SHIFT",
+              "RETURN"
+            ]
+          },
+          {
+            "action": "无痕浏览器",
+            "keys": [
+              "SUPER",
+              "SHIFT",
+              "ALT",
+              "B"
+            ]
+          },
+          {
+            "action": "文件管理器",
+            "keys": [
+              "SUPER",
+              "SHIFT",
+              "F"
+            ]
+          },
+          {
+            "action": "编辑器",
+            "keys": [
+              "SUPER",
+              "SHIFT",
+              "N"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "窗口",
+        "items": [
+          {
+            "action": "关闭窗口",
+            "keys": [
+              "SUPER",
+              "W"
+            ]
+          },
+          {
+            "action": "全屏",
+            "keys": [
+              "SUPER",
+              "F"
+            ]
+          },
+          {
+            "action": "浮动 / 平铺",
+            "keys": [
+              "SUPER",
+              "T"
+            ]
+          },
+          {
+            "action": "切换到相邻窗口",
+            "keys": [
+              "SUPER",
+              "方向键"
+            ]
+          }
+        ]
+      },
+      {
+        "title": "其他",
+        "items": [
+          {
+            "action": "切换工作区",
+            "keys": [
+              "SUPER",
+              "1–9"
+            ]
+          },
+          {
+            "action": "粘贴本机复制的文字",
+            "keys": [
+              "SUPER",
+              "V"
+            ]
+          },
+          {
+            "action": "查看全部快捷键",
+            "keys": [
+              "SUPER",
+              "K"
+            ]
+          },
+          {
+            "action": "截图",
+            "keys": [
+              "SUPER",
+              "CTRL",
+              "ALT",
+              "C"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

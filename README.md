@@ -2,7 +2,9 @@
 
 Go to Claude Space，原“Omarchy 隔离空间”。在电脑里创建独立的 Omarchy 虚拟机，配置 sing-box 和 Claude Code，并在软件内使用对话、终端与虚拟机浏览器。
 
-**当前为 2026-11-10 开发预览，应用版本 0.1.0。** [发行说明与验证范围](https://github.com/skyqingname/omarchy-space-releases/releases/tag/v0.1.0-20261110)。这个仓库用于分发软件包和使用说明。
+**已发布的软件包为 2026-11-10 开发预览，应用版本 0.1.0。** [发行说明与验证范围](https://github.com/skyqingname/omarchy-space-releases/releases/tag/v0.1.0-20261110)。2026-11-12 起，本仓库同时提供完整应用源码、构建脚本与测试；原发行包和历史标签继续保留。
+
+源码包含 2026-11-11 的 Windows DMIT 镜像源配置，早于该变更的已发布 ZIP 不会自动更新。源码导入不代表发布了新的客户端安装包。
 
 ## 下载
 
@@ -13,7 +15,7 @@ Go to Claude Space，原“Omarchy 隔离空间”。在电脑里创建独立的
 | 已有 Windows 用户，只替换程序 | [Windows 最新兼容补丁](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261110/GoToCS-windows-compat-patch-20261110.zip) |
 | 校验文件 | [SHA-256](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261110/SHA256SUMS-20261110.txt) |
 
-完整客户端包含运行时，不包含系统镜像或个人数据。首次打开时从官方发行页下载镜像（Mac 约 2.9 GB，Windows 约 2.1 GB），中断后可继续。Intel Mac、Windows ARM 尚未支持。
+完整客户端包含运行时，不包含系统镜像或个人数据。首次打开时按资源清单下载镜像（Mac 约 2.9 GB，Windows 约 2.1 GB），中断后可继续。上表的已发布包使用原 GitHub 源；当前源码的 Windows 镜像使用 DMIT，已有客户端切换方式见 [镜像源说明](docs/image-mirror.md)。Intel Mac、Windows ARM 尚未支持。
 
 ## 安装与更新
 
@@ -39,6 +41,22 @@ Claude Code 默认在虚拟机内以完全访问模式运行。“允许虚拟�
 ## 验证边界
 
 Mac 已验证启动、SSH 终端和虚拟机浏览器。对话钩子在真实 Linux Claude Code 会话中验证，界面以真实事件回放验证；已登录 Mac 应用中的完整对话往返及所有卡片尚未逐项验收。Windows 当前包已交叉构建并校验，新版终端、浏览器、对话、兼容显示与宿主 SSH 功能仍待 Windows 实机验收。
+
+## 源码与构建
+
+| 目录 / 文件 | 内容 |
+| --- | --- |
+| `src/` | React/TypeScript 安装向导、对话、终端和浏览器界面 |
+| `src-tauri/src/` | Rust 主机检测、存储、下载、QEMU 生命周期、SSH 和桌面命令 |
+| `guest/` | Python 客机网络保护、环境配置、地区策略、对话跟随和浏览器脚本 |
+| `scripts/` | 资源获取、打包、签名和 Windows SSH 配置 |
+| `tests/` | Python / PowerShell 专项测试；Rust 测试与模块放在一起 |
+| `product.config.json` / `runtime-profiles.json` | 产品和平台参数 |
+| `asset-sources.json` / `build-assets.example.json` | 构建依赖地址和本机路径模板 |
+
+从 [构建指南](docs/build.md) 开始。前端可用 `npm ci && npm run build` 验证；运行或分发桌面程序前，还需要准备平台运行资源。实现细节见 [架构与协议](docs/architecture.md)，Windows 使用方式见 [开发预览说明](docs/windows-preview.md)。
+
+依赖锁文件和应用图标均已包含。源码仓库不包含个人配置、凭据、VM 数据、调试日志、`node_modules`、编译目录或第三方运行时大文件；`build-assets.local.json` 由使用者根据模板填写并保留在本地。
 
 ## 第三方组件
 

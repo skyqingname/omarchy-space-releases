@@ -1,0 +1,8 @@
+{
+  "windows_executable": "src-tauri/target/x86_64-pc-windows-msvc/release/omarchy-desktop.exe",
+  "windows_archive": "dist-packages/GoToCS-0.1.0-windows-x64.zip",
+  "windows_program_name": "GoToCS.exe",
+  "macos_app": "src-tauri/target/aarch64-apple-darwin/release/bundle/macos/GoToCS.app",
+  "macos_signature_identity": "-",
+  "macos_archive": "dist-packages/GoToCS-0.1.0-macos-arm64.zip"
+}

@@ -1,0 +1,185 @@
+{
+  "macos-aarch64": {
+    "platform": "macos-aarch64",
+    "min_disk_gib": 32,
+    "host_access_service_hint": "本机没有开启 SSH 服务。请到系统设置 → 通用 → 共享，打开“远程登录”，然后重试。",
+    "terminal": {
+      "ssh": "/usr/bin/ssh",
+      "ssh_keygen": "/usr/bin/ssh-keygen"
+    },
+    "image": "factory.img.zst",
+    "image_format": "zstd",
+    "image_version": "4.0.0.r7218.gbe54892-1",
+    "qemu": "runtime/bin/Try Omarchy",
+    "zstd": "runtime/bin/zstd",
+    "sing_box_package": "sing-box.pkg.tar.zst",
+    "efi_variables_bytes": 67108864,
+    "arguments": [
+      "-machine",
+      "virt,gic-version=3",
+      "-accel",
+      "hvf",
+      "-cpu",
+      "host,pmu=off",
+      "-smp",
+      "{cpus},sockets=1,cores={cpus},threads=1",
+      "-m",
+      "{memory_mib}M",
+      "-nodefaults",
+      "-action",
+      "reboot=reset,shutdown=poweroff",
+      "-drive",
+      "if=pflash,format=raw,readonly=on,file={assets}/firmware/edk2-aarch64-code.fd",
+      "-drive",
+      "if=pflash,format=raw,file={vm}/efi-vars.fd",
+      "-smbios",
+      "type=11,value=io.systemd.credential.binary:tryomarchy.host=b21hcmNoeS5xZW11X3ZpcmdsPTEgb21hcmNoeS52aXJnbF9kdWFsX3NvdXJjZT0x",
+      "-netdev",
+      "user,id=omarchy-net",
+      "-device",
+      "virtio-net-pci,id=omarchy-nic,netdev=omarchy-net,mac=52:54:00:34:56:78,romfile=",
+      "-serial",
+      "none",
+      "-monitor",
+      "none",
+      "-drive",
+      "if=none,id=omarchy-root,file={vm}/disk.img,format=raw,media=disk,cache=writeback",
+      "-device",
+      "virtio-blk-pci,drive=omarchy-root,serial=omarchy-root,bootindex=0",
+      "-device",
+      "virtio-gpu-gl-pci,max_outputs=1,xres=1920,yres=1080,romfile=",
+      "-display",
+      "cocoa,gl=on,show-cursor=on,zoom-to-fit=off,full-screen=off,full-grab=on,immersive=off,swap-opt-cmd=off",
+      "-device",
+      "virtio-keyboard-pci,romfile=",
+      "-device",
+      "virtio-tablet-pci,romfile=",
+      "-device",
+      "virtio-pinch-pci,romfile=",
+      "-device",
+      "qemu-xhci,id=omarchy-usb,streams=off",
+      "-device",
+      "usb-kbd,bus=omarchy-usb.0,id=omarchy-boot-keyboard",
+      "-object",
+      "rng-random,id=omarchy-rng,filename=/dev/urandom",
+      "-device",
+      "virtio-rng-pci,rng=omarchy-rng",
+      "-device",
+      "virtio-balloon-pci,free-page-reporting=on",
+      "-device",
+      "virtio-serial-pci,id=omarchy-serial"
+    ],
+    "network_device_id": "omarchy-nic",
+    "downloads": {
+      "factory.img.zst": [
+        {
+          "url": "https://github.com/omacom/try-omarchy/releases/download/v1.2.0/omarchy-aarch64-edge.img.zst.001",
+          "bytes": 1073741824
+        },
+        {
+          "url": "https://github.com/omacom/try-omarchy/releases/download/v1.2.0/omarchy-aarch64-edge.img.zst.002",
+          "bytes": 1073741824
+        },
+        {
+          "url": "https://github.com/omacom/try-omarchy/releases/download/v1.2.0/omarchy-aarch64-edge.img.zst.003",
+          "bytes": 1019160722
+        }
+      ]
+    }
+  },
+  "windows-x86_64": {
+    "platform": "windows-x86_64",
+    "min_disk_gib": 16,
+    "host_access_service_hint": "Windows 本机 SSH 服务尚未就绪。点击“打开”并同意管理员授权，软件会安装 OpenSSH 服务器、配置仅本机访问并启动 sshd。",
+    "terminal": {
+      "ssh": "ssh.exe",
+      "ssh_keygen": "ssh-keygen.exe"
+    },
+    "software_graphics": {
+      "device": "virtio-gpu-pci,id=gpu0",
+      "display": "sdl,gl=off,show-cursor=off",
+      "vga": "none",
+      "kernel_parameter": "tryomarchy.render=cpu",
+      "environment": {
+        "SDL_RENDER_DRIVER": "software"
+      }
+    },
+    "image": "rootfs.ext4.zst",
+    "image_format": "zstd",
+    "image_version": "try-omarchy-windows-v0.13.0",
+    "qemu": "runtime/bin/qemu-system-x86_64w.exe",
+    "zstd": "zstd.exe",
+    "sing_box_package": "sing-box.pkg.tar.zst",
+    "efi_variables_bytes": 0,
+    "arguments": [
+      "-machine",
+      "q35,accel=whpx",
+      "-cpu",
+      "host",
+      "-smp",
+      "{cpus}",
+      "-m",
+      "{memory_mib}M",
+      "-nodefaults",
+      "-drive",
+      "file={vm}/disk.img,format=raw,if=virtio",
+      "-kernel",
+      "{images}/vmlinuz-linux",
+      "-initrd",
+      "{images}/initramfs-linux.img",
+      "-append",
+      "root=/dev/vda rw rootwait console=ttyS0 loglevel=4 systemd.show_status=false rd.systemd.show_status=false omarchy.qemu=1 tryomarchy.render=gpu vt.global_cursor_default=0 video=1440x900",
+      "-device",
+      "virtio-vga-gl,blob=on,hostmem=4G,venus=on",
+      "-display",
+      "sdl,gl=on,show-cursor=off",
+      "-device",
+      "virtio-keyboard-pci",
+      "-device",
+      "virtio-tablet-pci",
+      "-device",
+      "virtio-net-pci,id=omarchy-nic,netdev=n0,romfile=",
+      "-netdev",
+      "user,id=n0",
+      "-device",
+      "virtio-rng-pci",
+      "-device",
+      "virtio-serial-pci,id=virtioserial0",
+      "-device",
+      "qemu-xhci,id=omarchy-usb",
+      "-global",
+      "ICH9-LPC.disable_s3=1",
+      "-global",
+      "ICH9-LPC.disable_s4=1",
+      "-audiodev",
+      "none,id=snd",
+      "-device",
+      "virtio-sound-pci,audiodev=snd",
+      "-monitor",
+      "none",
+      "-serial",
+      "none"
+    ],
+    "network_device_id": "omarchy-nic",
+    "downloads": {
+      "rootfs.ext4.zst": [
+        {
+          "url": "https://download.maqihang.si/releases/gotocs/images/windows-x86_64/v0.13.0/rootfs.ext4.zst",
+          "bytes": 1877333998
+        }
+      ],
+      "initramfs-linux.img": [
+        {
+          "url": "https://download.maqihang.si/releases/gotocs/images/windows-x86_64/v0.13.0/initramfs-linux.img",
+          "bytes": 360175920
+        }
+      ],
+      "vmlinuz-linux": [
+        {
+          "url": "https://download.maqihang.si/releases/gotocs/images/windows-x86_64/v0.13.0/vmlinuz-linux",
+          "bytes": 17244672
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "bundle": {
+    "targets": ["nsis"],
+    "resources": {
+      "../assets/windows-x86_64/manifest.json": "resources/runtime-pack/manifest.json",
+      "../assets/windows-x86_64/runtime/": "resources/runtime-pack/runtime/",
+      "../assets/windows-x86_64/zstd.exe": "resources/runtime-pack/zstd.exe",
+      "../assets/windows-x86_64/sing-box.pkg.tar.zst": "resources/runtime-pack/sing-box.pkg.tar.zst"
+    }
+  }
+}
