@@ -1,6 +1,6 @@
-# GoToCS · Windows 开发预览（2026-11-10）
+# GoToCS · Windows 开发预览（2026-11-13）
 
-GoToCS（Go to Claude Space）原名“Omarchy 隔离空间”。此包包含当前对话、终端、虚拟机浏览器及兼容显示功能，仍为 0.1.0 开发预览。应用标识 dev.omarchy.space 保持不变，原环境及存放位置继续使用。
+GoToCS（Go to Claude Space）原名“Omarchy 隔离空间”。此包为 `v0.1.0-20261113`，应用版本仍为 0.1.0。包含对话、终端、虚拟机浏览器、兼容显示，以及本机文件附件、API 凭据状态识别和启动参数长度修复。应用标识 `dev.omarchy.space` 保持不变，原环境及存放位置继续使用。
 
 ## 首次使用
 
@@ -12,22 +12,30 @@ GoToCS（Go to Claude Space）原名“Omarchy 隔离空间”。此包包含当
 
 首次下载系统镜像约 2.1 GB；下载镜像、安装客机组件、Claude Code 和使用 Claude 服务均需要网络。完整客户端包不包含已创建的虚拟磁盘、用户登录或节点。
 
-## DMIT 镜像下载源（2026-11-11）
+## DMIT 镜像下载源
 
-Windows v0.13.0 的三个官方镜像已镜像到 DMIT，内容保持原样。已有完整客户端使用 `GoToCS-windows-dmit-source-20261111.zip`，退出软件后备份并替换 `resources/runtime-pack/manifest.json`；此补丁没有 EXE/运行组件，不能独立运行。已有镜像和下载断点保留。
+Windows v0.13.0 的三个官方镜像已镜像到 DMIT，内容保持原样。本次完整包及兼容补丁均包含当前 `resources/runtime-pack/manifest.json`，旧版安装包不会自动切源。已有镜像和下载断点保留。
 
-首次使用可完整解压 `GoToCS-0.1.0-windows-x64-dmit-20261111.zip`。该包沿用 2026-11-10 同一个 EXE，只更换镜像下载清单并增加说明。原 GitHub 发行附件仍使用此前清单。地址、验证及回滚见 [image-mirror.md](image-mirror.md)。11 月 11 日提及的配置补丁/完整包为当时本地交付物，未作为本仓库的发行附件上传；已有用户可按镜像源说明更新清单。
+首次使用请下载 `GoToCS-0.1.0-windows-x64.zip`。2026-11-10 及更早发行附件保持原样；历史 DMIT 配置补丁只更新清单，不包含本次程序修复。地址、验证及回滚见 [image-mirror.md](image-mirror.md)。
 
 ## 旧版兼容补丁
 
-GoToCS-windows-compat-patch-20261110.zip 仅含 OmarchySpace.exe，兼容原来的安装目录：
+`GoToCS-windows-compat-patch-20261113.zip` 包含 `OmarchySpace.exe`、下载清单及使用说明，适用于已有 v0.13.0 Windows 运行资源的安装目录：
 
 1. 在旧程序中正常关闭虚拟机，再退出程序。
-2. 将原 OmarchySpace.exe 改名备份。
-3. 将补丁中的 OmarchySpace.exe 放在原位置，保留 resources、镜像及数据目录。
+2. 备份原 `OmarchySpace.exe`（或 `GoToCS.exe`）和 `resources/runtime-pack/manifest.json`。
+3. 将补丁中的 `OmarchySpace.exe` 放在原位置，并将补丁内的 `resources/runtime-pack/manifest.json` 复制到对应位置；其余 resources、镜像及数据目录保留。
 4. 运行新 EXE，窗口名称显示为 GoToCS。无需新建环境或移动磁盘。
 
 如果原文件名已经是 GoToCS.exe，将补丁中的 EXE 改名为 GoToCS.exe 后替换即可。不要同时运行旧、新 EXE。首次启动会按新版流程更新必要的客机配置，并保留原环境数据。
+
+补丁不含完整运行时，不能独立运行。运行资源版本不同或文件不完整时，使用完整包并继续选择原数据目录，不要删除或重建虚拟磁盘。回滚时正常关闭程序，恢复备份的 EXE 和下载清单。
+
+## 文件附件与 API 凭据
+
+环境就绪后，在对话输入框点击附件按钮多选本机文件，上传完成后发送；默认最多 20 个附件、单文件 512 MiB。失败可重试，上传中可取消。只传所选文件，不需要开启“允许虚拟机访问本机”。已传入副本位于客机工作目录的 attachments 子目录，移除卡片不会删除副本。Windows 资源管理器跨窗口物理拖放仍待验收。
+
+图形登录状态识别客机 API Key/Token，Claude 与检测进程均在客机登录 shell 中启动；不导入本机 Claude 登录、设置或环境变量。首次引导和工作目录信任仍需在客机完成。修改客机登录脚本后需重新连接对话。
 
 ## 显示、权限与网络
 
@@ -37,8 +45,8 @@ GoToCS-windows-compat-patch-20261110.zip 仅含 OmarchySpace.exe，兼容原来�
 
 ## 验证范围
 
-Mac 已验证当前应用启动、终端连接和虚拟机浏览器等路径。对话钩子与记录处理已在 Linux 的真实交互式 Claude Code 验证，界面用真实事件录制回放测试。当前对话完整往返和所有卡片未在已登录的真实 Mac 应用中逐项验收。
+本次构建验证、专项测试及压缩包校验见发行页。2026-11-12 贡献者曾在 Windows 源码构建中验证真实对话、附件按钮、DOCX/PDF/TXT 读取及大小/哈希，但这不替代本次交叉构建安装包的完整设备验收。
 
-Windows 新版已交叉构建并检查压缩包；ConPTY/SSH、内置浏览器、完整对话和硬件图形兼容性仍待 Windows 实机验收。程序没有 Windows 发行签名，属于开发预览。
+Windows 跨窗口物理拖放、真实 SSH 中断/超时/上传中关机及硬件图形兼容性仍待验收。部分镜像的 ufw/Apps 依赖、锁屏灰屏、TXT 默认打开和显示语言体验仍有已知问题，详见源码仓库的 `docs/windows-troubleshooting.md`。程序没有 Windows 发行签名，属于开发预览。
 
 出错时保留完整提示、vm/runtime.log、deployment.json 和失败阶段。旧环境默认位于用户本地应用数据目录 dev.omarchy.space，选择过其他存放位置的以原设置为准。不要为了排障删除磁盘或重新初始化环境。
