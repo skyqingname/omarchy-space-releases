@@ -23,6 +23,13 @@
     "poll_milliseconds": 500,
     "max_bytes": 1048576
   },
+  "attachments": {
+    "directory": "attachments",
+    "max_file_bytes": 536870912,
+    "max_files": 20,
+    "chunk_bytes": 65536,
+    "timeout_seconds": 600
+  },
   "host_access": {
     "address": "10.0.2.2",
     "port": 22,

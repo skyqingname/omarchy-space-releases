@@ -73,8 +73,13 @@ pub fn connection(state: &AppState) -> Result<(u16, String), String> {
 // Claude's sign-in and the chat's links open in the VM browser.
 const WAYLAND: &str = "for socket in \"$XDG_RUNTIME_DIR\"/wayland-[0-9]; do [ -S \"$socket\" ] && export WAYLAND_DISPLAY=\"${socket##*/}\"; done";
 
-// Runs in the account's login shell, so Claude sees the same environment as a
-// terminal in the VM desktop.
+// These strings are executed by SSH inside the guest, never by a host shell.
+fn guest_login_command(command: &str) -> String {
+    format!("exec bash -lc {}", quote(command))
+}
+
+// Runs in the guest account's login shell, so Claude sees the same environment
+// as its status follower.
 fn claude_command(cfg: &TerminalConfig, claude_path: &str, session: &str, settings: &str) -> String {
     let mut arguments: Vec<String> = cfg.claude_arguments.iter().map(|argument| quote(argument)).collect();
     arguments.extend(["--settings".into(), quote(settings)]);
@@ -87,7 +92,7 @@ if [ -f \"$HOME\"/{projects}/\"$(pwd -P | sed 's/[^A-Za-z0-9]/-/g')\"/{session}.
 then exec \"$HOME\"/{claude} {arguments} --resume {session}; \
 else exec \"$HOME\"/{claude} {arguments} --session-id {session}; fi",
         claude = quote(claude_path));
-    format!("exec bash -lc {}", quote(&inner))
+    guest_login_command(&inner)
 }
 
 // The guest programs take the terminal parameters, and the session they are
@@ -96,6 +101,13 @@ fn guest_argument(cfg: &TerminalConfig, session: Option<&str>) -> String {
     let mut value = serde_json::to_value(cfg).unwrap();
     value["session"] = json!(session);
     quote(&value.to_string())
+}
+
+fn follower_command(cfg: &TerminalConfig, session: &str) -> String {
+    // Keep login-profile output in the diagnostic stream, not in the JSON
+    // handshake. Only the Python follower gets the saved protocol stdout.
+    let command = format!("exec python3 -u - {} >&3 3>&-", guest_argument(cfg, Some(session)));
+    format!("{} 3>&1 1>&2", guest_login_command(&command))
 }
 
 fn follow(app: AppHandle, generation: u64, mut reader: BufReader<ChildStdout>, record_path: PathBuf) {
@@ -193,7 +205,7 @@ pub fn open(app: &AppHandle, generation: u64, session: Option<String>, fresh: bo
     let claude_path = state.config.guest["claude_path"].as_str().ok_or("缺少 Claude 安装路径配置")?;
 
     let log = File::create(vm_dir.join(&cfg.follow_log_name)).map_err(|e| e.to_string())?;
-    let mut follower = windowless(Command::new(&tools.ssh).args(&ssh).arg(format!("exec python3 -u - {}", guest_argument(&cfg, Some(&session)))))
+    let mut follower = windowless(Command::new(&tools.ssh).args(&ssh).arg(follower_command(&cfg, &session)))
         .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(log).spawn().map_err(|e| format!("无法连接对话记录：{e}"))?;
     let mut records = BufReader::new(follower.stdout.take().unwrap());
     let settings = match prepare(follower.stdin.take().unwrap(), &mut records) {
@@ -303,3 +315,6 @@ pub fn resize(state: &AppState, cols: u16, rows: u16) -> Result<(), String> {
     let chat = chat.as_ref().ok_or("对话尚未连接")?;
     chat.master.resize(PtySize { rows, cols, pixel_width: 0, pixel_height: 0 }).map_err(|e| e.to_string())
 }
+
+#[cfg(all(test, unix))]
+mod tests;
