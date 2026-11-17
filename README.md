@@ -2,18 +2,18 @@
 
 Go to Claude Space，原“Omarchy 隔离空间”。在电脑里创建独立的 Omarchy 虚拟机，配置 sing-box 和 Claude Code，并在软件内使用对话、终端与虚拟机浏览器。
 
-**已发布的软件包为 2026-11-13 开发预览，应用版本 0.1.0。** [发行说明与验证范围](https://github.com/skyqingname/omarchy-space-releases/releases/tag/v0.1.0-20261113)。本仓库同时提供完整应用源码、构建脚本与测试；原发行包和历史标签继续保留。
+**已发布的软件包为 2026-11-17 开发预览，应用版本 0.1.0。** [发行说明与验证范围](https://github.com/skyqingname/omarchy-space-releases/releases/tag/v0.1.0-20261117)。本仓库同时提供完整应用源码、构建脚本与测试；原发行包和历史标签继续保留。
 
-本次安装包包含宿主文件附件、API Key 登录状态修复、Windows 启动参数长度修复及 DMIT 镜像源配置。旧版 ZIP 不会自动更新，需下载新包或按下方说明应用补丁。
+本次更新修复历史对话中的超长命令、Base64 参数和提示消息撑宽对话区域的问题，保留原始消息文本、空白与换行，以及 Markdown 代码块和表格自身的局部横向滚动。此前的宿主文件附件、API Key 登录状态、Windows 启动参数长度修复及 DMIT 镜像源配置继续包含在包内。旧版 ZIP 不会自动更新，需下载新包或按下方说明应用补丁。
 
 ## 下载
 
 | 平台 / 用途 | 下载 |
 | --- | --- |
-| Apple Silicon Mac，macOS 15+ | [Mac 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261113/GoToCS-0.1.0-macos-arm64.zip) |
-| Windows 10/11 x64 | [Windows 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261113/GoToCS-0.1.0-windows-x64.zip) |
-| 已有 Windows 用户，更新程序和下载清单 | [Windows 最新兼容补丁](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261113/GoToCS-windows-compat-patch-20261113.zip) |
-| 校验文件 | [SHA-256](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261113/SHA256SUMS-20261113.txt) |
+| Apple Silicon Mac，macOS 15+ | [Mac 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117/GoToCS-0.1.0-macos-arm64.zip) |
+| Windows 10/11 x64 | [Windows 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117/GoToCS-0.1.0-windows-x64.zip) |
+| 已有 Windows 用户，更新程序和下载清单 | [Windows 最新兼容补丁](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117/GoToCS-windows-compat-patch-20261117.zip) |
+| 校验文件 | [SHA-256](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117/SHA256SUMS-20261117.txt) |
 
 完整客户端包含运行时，不包含系统镜像或个人数据。首次打开时按资源清单下载镜像（Mac 约 2.9 GB，Windows 约 2.1 GB），中断后可继续。Windows 镜像使用 DMIT，Mac 沿用官方 GitHub 源，详见 [镜像源说明](docs/image-mirror.md)。Intel Mac、Windows ARM 尚未支持。
 
@@ -50,7 +50,7 @@ Claude Code 默认在虚拟机内以完全访问模式运行。“允许虚拟�
 
 2026-11-12 的 Windows 本地源码构建已实际验证对话、API Key 状态、附件按钮、客机接收与 DOCX/PDF/TXT 读取；文件大小及 SHA-256 已独立核对。Windows 跨窗口物理拖放和新增功能的 macOS 实机验收仍未完成。从目录“拒绝访问”到此次功能验收的故障、处理和遗留问题见 [Windows 排障与验收记录](docs/windows-troubleshooting.md)。此记录不代表旧发行包已经更新。
 
-本次公开包通过前端、Mac/Windows release 构建及专项测试，具体结果见发行说明。已有 Mac 版本曾验证启动、SSH 终端和虚拟机浏览器；本次新增功能的 Mac 实机、Windows 跨窗口拖放及真实 SSH 中断等场景仍待验收。本次 Windows 包为交叉构建，未把贡献者之前的源码实机测试视为此安装包的逐项验收。
+本次仅变更对话样式；前端类型检查/构建、Mac/Windows release 构建，以及 Chromium/WebKit 中实际 React 界面的 48 组布局检查通过。验证使用合成对话数据和模拟原生 IPC，未执行测试命令或访问真实 VM。PR 贡献者报告 Windows 源码构建实机复测通过；本次交叉构建包未另做安装与完整设备验收，具体结果见发行说明。已有 Mac 版本曾验证启动、SSH 终端和虚拟机浏览器；本次新增功能的 Mac 实机、Windows 跨窗口拖放及真实 SSH 中断等场景仍待验收。本次 Windows 包为交叉构建，未把贡献者之前的源码实机测试视为此安装包的逐项验收。
 
 ## 源码与构建
 

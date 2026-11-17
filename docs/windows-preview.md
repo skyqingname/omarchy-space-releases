@@ -1,6 +1,6 @@
-# GoToCS · Windows 开发预览（2026-11-13）
+# GoToCS · Windows 开发预览（2026-11-17）
 
-GoToCS（Go to Claude Space）原名“Omarchy 隔离空间”。此包为 `v0.1.0-20261113`，应用版本仍为 0.1.0。包含对话、终端、虚拟机浏览器、兼容显示，以及本机文件附件、API 凭据状态识别和启动参数长度修复。应用标识 `dev.omarchy.space` 保持不变，原环境及存放位置继续使用。
+GoToCS（Go to Claude Space）原名“Omarchy 隔离空间”。此包为 `v0.1.0-20261117`，应用版本仍为 0.1.0。本次修复长命令、Base64 参数和提示消息撑宽对话区域的问题；原始文本、空格和换行保留，Markdown 代码块与宽表格仍可局部横向滚动。此前的对话、终端、虚拟机浏览器、兼容显示、本机文件附件、API 凭据状态识别和启动参数长度修复继续保留。应用标识 `dev.omarchy.space` 保持不变，原环境及存放位置继续使用。
 
 ## 首次使用
 
@@ -20,7 +20,7 @@ Windows v0.13.0 的三个官方镜像已镜像到 DMIT，内容保持原样。�
 
 ## 旧版兼容补丁
 
-`GoToCS-windows-compat-patch-20261113.zip` 包含 `OmarchySpace.exe`、下载清单及使用说明，适用于已有 v0.13.0 Windows 运行资源的安装目录：
+`GoToCS-windows-compat-patch-20261117.zip` 包含 `OmarchySpace.exe`、下载清单及使用说明，适用于已有 v0.13.0 Windows 运行资源的安装目录：
 
 1. 在旧程序中正常关闭虚拟机，再退出程序。
 2. 备份原 `OmarchySpace.exe`（或 `GoToCS.exe`）和 `resources/runtime-pack/manifest.json`。
@@ -45,7 +45,7 @@ Windows v0.13.0 的三个官方镜像已镜像到 DMIT，内容保持原样。�
 
 ## 验证范围
 
-本次构建验证、专项测试及压缩包校验见发行页。2026-11-12 贡献者曾在 Windows 源码构建中验证真实对话、附件按钮、DOCX/PDF/TXT 读取及大小/哈希，但这不替代本次交叉构建安装包的完整设备验收。
+本次前端类型检查/构建、Mac/Windows release 构建及压缩包校验通过；Chromium/WebKit 中实际 React 界面的 48 组布局检查通过，使用合成对话及模拟 IPC，不替代原生设备验收。PR #2 贡献者报告 Windows 源码构建的长命令实机复测通过，本次发行的交叉构建包未另做安装验收。详细结果见发行页。2026-11-12 贡献者曾在 Windows 源码构建中验证真实对话、附件按钮、DOCX/PDF/TXT 读取及大小/哈希，但这不替代本次交叉构建安装包的完整设备验收。
 
 Windows 跨窗口物理拖放、真实 SSH 中断/超时/上传中关机及硬件图形兼容性仍待验收。部分镜像的 ufw/Apps 依赖、锁屏灰屏、TXT 默认打开和显示语言体验仍有已知问题，详见源码仓库的 `docs/windows-troubleshooting.md`。程序没有 Windows 发行签名，属于开发预览。
 
