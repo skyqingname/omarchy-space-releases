@@ -43,7 +43,8 @@ main.chat-main{height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .markdown table{border-collapse:collapse;margin:0 0 10px;font-size:13px;display:block;overflow-x:auto}.markdown th,.markdown td{border:1px solid #d9dfcc;padding:5px 10px;text-align:left}
 .markdown h1,.markdown h2,.markdown h3,.markdown h4{font-family:inherit;font-size:15px;font-weight:650;margin:16px 0 8px;letter-spacing:0;line-height:1.5}
 .markdown blockquote{margin:0 0 10px;padding-left:12px;border-left:3px solid #d3dfc0;color:#5f6f50}.markdown a{color:#4d6141}.markdown hr{border:0;border-top:1px solid #dfe5d5;margin:14px 0}
-.message.command code{font-family:Menlo,Consolas,monospace;font-size:12px;color:#5d6d4c;background:#eef0e6;padding:4px 8px;border-radius:4px}
+.message.command,.message.notice{min-width:0;overflow-wrap:anywhere}
+.message.command code{font-family:Menlo,Consolas,monospace;font-size:12px;color:#5d6d4c;background:#eef0e6;padding:4px 8px;border-radius:4px;white-space:pre-wrap}
 .message.notice{font-size:12px;color:#8c977f}.message.notice pre{white-space:pre-wrap;font-family:Menlo,Consolas,monospace;font-size:11px;margin:0;color:#6f7a63}
 .tool-head{display:flex;align-items:center;gap:8px;border:0;background:none;padding:2px 0;color:#6b7660;font-size:13px;max-width:100%;text-align:left}.tool-head:hover{color:#33432d}
 .tool-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
