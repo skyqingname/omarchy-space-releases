@@ -56,7 +56,7 @@ fn host_snapshot(state: &AppState) -> Result<Value, String> {
     let software_rendering = if data_dir.join("vm/machine.json").is_file() { vm::read_machine(&data_dir)?.software_rendering } else { false };
     Ok(json!({"platform":config::platform(),"supported":supported,"cpu_count":hardware.cpus,"hardware":hardware,
         "assets":assets,"asset_root":root,"data_directory":data_dir,"config":state.config,
-        "runtime_profile":runtime_profile,
+        "runtime_profile":runtime_profile,"host_access_service_ready":hostaccess::service_ready(&state.config.host_access).is_ok(),
         "graphics":{"available":runtime_profile.software_graphics.is_some(),"software_rendering":software_rendering},
         "storage":{"default_directory":default_dir,"can_change":can_change,"disk_limit_gib":disk_limit_gib},
         "view":state.view.lock().unwrap().clone()}))

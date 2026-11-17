@@ -2,24 +2,23 @@
 
 Go to Claude Space，原“Omarchy 隔离空间”。在电脑里创建独立的 Omarchy 虚拟机，配置 sing-box 和 Claude Code，并在软件内使用对话、终端与虚拟机浏览器。
 
-**已发布的软件包为 2026-11-17 第二版开发预览，应用版本 0.1.0。** [发行说明与验证范围](https://github.com/skyqingname/omarchy-space-releases/releases/tag/v0.1.0-20261117.1)。本仓库同时提供完整应用源码、构建脚本与测试；原发行包和历史标签继续保留。
+**已发布的软件包为 2026-11-17 第三版开发预览，应用版本 0.1.0。** [发行说明与验证范围](https://github.com/skyqingname/omarchy-space-releases/releases/tag/v0.1.0-20261117.2)。本仓库同时提供完整应用源码、构建脚本与测试；原发行包和历史标签继续保留。
 
-本次为 Mac 约 2.9 GiB 的系统镜像增加 DMIT 下载源，三个分片与官方文件的 SHA-256 一致，保留已有下载进度。包含同日首版的长命令换行修复，以及此前的宿主文件附件、API Key 登录状态、Windows 启动参数长度修复。旧版 ZIP 不会自动更新，需下载新包或按下方说明应用补丁。
+本次侧栏可以收起成图标栏；浏览器页去掉顶部标题栏和状态条，画面铺满，并显示鼠标指针；对话页去掉顶部标题栏；新建环境默认允许虚拟机访问本机，可在“我的环境”关闭。Mac 与 Windows 系统镜像均从 DMIT 下载。包含此前的长命令换行修复、宿主文件附件、API Key 登录状态、Windows 启动参数长度修复。旧版 ZIP 不会自动更新，需下载新包或按下方说明应用补丁。
 
 ## 下载
 
 | 平台 / 用途 | 下载 |
 | --- | --- |
-| Apple Silicon Mac，macOS 15+ | [Mac 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.1/GoToCS-0.1.0-macos-arm64.zip) |
-| Windows 10/11 x64 | [Windows 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.1/GoToCS-0.1.0-windows-x64.zip) |
-| 已有 Windows 用户，更新程序和下载清单 | [Windows 最新兼容补丁](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.1/GoToCS-windows-compat-patch-20261117.1.zip) |
-| 校验文件 | [SHA-256](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.1/SHA256SUMS-20261117.1.txt) |
+| Apple Silicon Mac，macOS 15+ | [Mac 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.2/GoToCS-0.1.0-macos-arm64.zip) |
+| Windows 10/11 x64 | [Windows 完整包](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.2/GoToCS-0.1.0-windows-x64.zip) |
+| 已有 Windows 用户，更新程序和下载清单 | [Windows 最新兼容补丁](https://github.com/skyqingname/omarchy-space-releases/releases/download/v0.1.0-20261117.2/GoToCS-windows-compat-patch-20261117.2.zip) |
 
 完整客户端包含运行时，不包含系统镜像或个人数据。首次打开时按资源清单下载镜像（Mac 约 2.9 GB，Windows 约 2.1 GB），中断后可继续。Mac 与 Windows 镜像均使用 DMIT，详见 [镜像源说明](docs/image-mirror.md)。Intel Mac、Windows ARM 尚未支持。
 
 ## 安装与更新
 
-Mac：解压后将 `GoToCS.app` 放入“应用程序”。更新前正常关闭虚拟机并退出旧版。此版未经过 Apple 公证，系统可能阻止直接打开；请先核对来源与校验值，再按 macOS 的安全提示处理。
+Mac：解压后将 `GoToCS.app` 放入“应用程序”。更新前正常关闭虚拟机并退出旧版。此版未经过 Apple 公证，系统可能阻止直接打开；请确认是从本页下载的，再按 macOS 的安全提示处理。
 
 Windows：完整解压后保持 `GoToCS.exe` 与 `resources` 相邻，再运行程序。需要开启硬件虚拟化与 Windows Hypervisor Platform，安装 WebView2；内置终端还需要 Windows 可选功能中的 OpenSSH 客户端（`ssh.exe`、`ssh-keygen.exe`）。此版没有 Windows 发行签名，具体流程见包内“使用说明.md”。
 
@@ -36,7 +35,7 @@ Windows：完整解压后保持 `GoToCS.exe` 与 `resources` 相邻，再运行�
 
 节点来自软件里输入的链接；代理停止或节点失效时，客机应用不会回退直连。软件不导入宿主的 Claude 登录、浏览器资料或个人代理配置。下载系统镜像、安装及使用 Claude 均需要网络。
 
-Claude Code 默认在虚拟机内以完全访问模式运行。“允许虚拟机访问本机”是独立开关，默认关闭；开启后可通过 SSH 操作宿主机，权限与宿主当前用户相同。Windows 可通过一次 UAC 准备仅监听本机回环地址的 SSH 服务。隔离措施不能阻止有客机管理员权限的人主动修改网络保护。
+Claude Code 默认在虚拟机内以完全访问模式运行。“允许虚拟机访问本机”是独立开关，新环境默认打开，可随时关闭；打开时可通过 SSH 操作宿主机，权限与宿主当前用户相同。Mac 需要在系统设置里打开“远程登录”；Windows 可通过一次 UAC 准备仅监听本机回环地址的 SSH 服务。隔离措施不能阻止有客机管理员权限的人主动修改网络保护。
 
 ## 本机文件附件
 

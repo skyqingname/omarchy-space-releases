@@ -137,14 +137,10 @@ export function BrowserPane({ visible, platform }: { visible: boolean; platform:
   useEffect(() => { if (visible && state === 'connected') client.current!.focus(); }, [visible, state]);
 
   return <section className={`browser-pane ${visible ? '' : 'hidden'}`} aria-label="虚拟机浏览器">
-    <div className="chat-toolbar">
-      <span className={`chat-state ${state === 'connected' ? '' : state === 'connecting' ? 'working' : 'ended'}`}><span className="status-dot"/>虚拟机浏览器<span>{state === 'connected' ? '通过所选节点上网' : state === 'connecting' ? '正在连接' : '已断开'}</span></span>
-      <div className="chat-actions">{state === 'closed' && <button className="tool-button" onClick={connect}><RotateCcw size={15}/>重新连接</button>}</div>
-    </div>
-    {error && <div role="alert" className="error-banner chat-error"><span>{error}</span></div>}
     <div className="browser-body">
       <div className="browser-screen" ref={screen} style={{ left: -reserved[0], top: -reserved[1], right: -reserved[2], bottom: -reserved[3] }}/>
       {state === 'connecting' && <div className="browser-wait"><LoaderCircle className="spin" size={18}/>正在打开虚拟机里的浏览器</div>}
+      {state === 'closed' && <div className="browser-wait closed" role="alert"><span>{error || '浏览器连接已断开'}</span><button className="secondary" onClick={connect}><RotateCcw size={15}/>重新连接</button></div>}
     </div>
   </section>;
 }

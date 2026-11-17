@@ -108,3 +108,17 @@ main.chat-main{height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .meter{margin-left:auto;display:flex;align-items:center;gap:12px;white-space:nowrap}.context-meter{display:flex;align-items:center;gap:4px}
 .context-ring{width:13px;height:13px;transform:rotate(-90deg)}.context-ring circle{fill:none;stroke-width:3;stroke:#dfe5d5}.context-ring circle+circle{stroke:#8caa5b}
 .context-meter.high{color:#b07a2a}.context-meter.high circle+circle{stroke:#d0a24c}.context-meter.full{color:#955e3c}.context-meter.full circle+circle{stroke:#955e3c}
+.sidebar{overflow:hidden;transition:width .3s cubic-bezier(.2,.8,.2,1),padding .3s cubic-bezier(.2,.8,.2,1)}
+.sidebar :is(.brand,.side-heading,.nav-label,.side-bottom){white-space:nowrap}
+.sidebar :is(.brand,.side-heading,.nav-label,.active-dot,.side-bottom){transition:opacity .2s ease}
+.sidebar.collapsed{width:68px;padding-left:22px;padding-right:22px}
+.sidebar .step-number{flex-shrink:0}
+.sidebar.collapsed :is(.brand,.side-heading,.nav-label,.active-dot,.side-bottom){opacity:0;pointer-events:none}
+.drawer-toggle{position:absolute;top:10px;right:14px;width:28px;height:28px;display:grid;place-items:center;padding:0;border:0;border-radius:6px;background:none;color:#899582;transition:top .3s cubic-bezier(.2,.8,.2,1),right .3s cubic-bezier(.2,.8,.2,1),color .2s,background .2s}
+.drawer-toggle:hover{color:#d7e8ad;background:#313b30}
+.sidebar.collapsed .drawer-toggle{top:44px;right:20px}
+/* Hyprland hands wayvnc an empty pointer image, and noVNC hides the page's pointer while it shows the VM's. This computer's arrow stays. */
+.browser-screen canvas{cursor:default!important}
+.browser-wait.closed{flex-direction:column;gap:14px;pointer-events:auto;background:rgba(31,38,32,.88)}
+.browser-wait.closed .secondary{border-color:#4d5a45;color:#d7e8ad}
+.browser-wait.closed .secondary:not(:disabled):hover{background:#2b352a}

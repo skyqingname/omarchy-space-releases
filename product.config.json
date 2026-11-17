@@ -36,7 +36,8 @@
     "alias": "host",
     "key_comment": "omarchy-space-host",
     "key_options": "from=\"127.0.0.1,::1\",no-agent-forwarding,no-port-forwarding,no-X11-forwarding",
-    "check_timeout_seconds": 2
+    "check_timeout_seconds": 2,
+    "enabled_by_default": true
   },
   "terminal": {
     "guest_port": 22,

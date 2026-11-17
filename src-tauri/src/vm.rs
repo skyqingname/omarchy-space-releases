@@ -189,7 +189,7 @@ pub fn prepare(app: &AppHandle, run_id: u64, assets: &AssetPack, vm_dir: &Path, 
     if assets.manifest.efi_variables_bytes > 0 {
         File::create(vm_dir.join("efi-vars.fd")).and_then(|f| f.set_len(assets.manifest.efi_variables_bytes)).map_err(|e| e.to_string())?;
     }
-    let machine = Machine { resources: resources.clone(), image_version: assets.manifest.image_version.clone(), asset_root: assets.root.to_string_lossy().into(), configured: false, host_access: false, software_rendering: false };
+    let machine = Machine { resources: resources.clone(), image_version: assets.manifest.image_version.clone(), asset_root: assets.root.to_string_lossy().into(), configured: false, host_access: app.state::<AppState>().config.host_access.enabled_by_default, software_rendering: false };
     write_machine(vm_dir, &machine)?;
     fs::rename(&partial, &disk).map_err(|e| e.to_string())?;
     Ok(())

@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { open } from '@tauri-apps/plugin-dialog';
-import { ArrowRight, ArrowUpRight, Check, ChevronLeft, Cpu, Disc3, FolderOpen, Globe, Globe2, HardDrive, Keyboard, KeyRound, LoaderCircle, LockKeyhole, MessageSquare, Monitor, Network, Play, Power, RefreshCw, Terminal, X } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Check, ChevronLeft, Cpu, Disc3, FolderOpen, Globe, Globe2, HardDrive, Keyboard, KeyRound, LoaderCircle, LockKeyhole, MessageSquare, Monitor, Network, PanelLeftClose, PanelLeftOpen, Play, Power, RefreshCw, Terminal, X } from 'lucide-react';
 import { ChatPane } from './chat';
 import { BrowserPane } from './browser';
 import product from '../product.config.json';
@@ -14,7 +14,7 @@ type Region = {country:string;subdivision:string|null;timezone:string;timezone_m
 type Delivery = {host_access_active?:boolean;terminal_user?:string;claude_version:string;sing_box_version:string;egress_country:string;region:Region;proxy_required:boolean;network_guard_active:boolean};
 // Rust owns this record. Which page is showing is derived from it, never stored.
 type View = { phase: string; message: string; running: boolean; task: 'install'|'reconfigure'|'start'|'download'|null; environment: 'none'|'incomplete'|'restart_required'|'ready'; delivery: Delivery|null; failure: {kind:string;detail:string}|null; progress: number|null; host_access: boolean };
-type Host = { platform: string; supported: boolean; cpu_count: number; hardware: {memory_mib:number;free_disk_gib:number;virtualization_ready:boolean;prerequisite:string}; assets: {ready: boolean; image_ready: boolean; download_bytes?: number; message: string; image_version?: string}; asset_root: string; data_directory: string; storage: {default_directory:string;can_change:boolean;disk_limit_gib:number}; runtime_profile: {min_disk_gib:number}; graphics:{available:boolean;software_rendering:boolean}; config: typeof product; view: View };
+type Host = { platform: string; supported: boolean; cpu_count: number; hardware: {memory_mib:number;free_disk_gib:number;virtualization_ready:boolean;prerequisite:string}; assets: {ready: boolean; image_ready: boolean; download_bytes?: number; message: string; image_version?: string}; asset_root: string; data_directory: string; storage: {default_directory:string;can_change:boolean;disk_limit_gib:number}; runtime_profile: {min_disk_gib:number;host_access_service_hint:string}; host_access_service_ready: boolean; graphics:{available:boolean;software_rendering:boolean}; config: typeof product; view: View };
 type Node = { index: number; name: string; protocol: string };
 type Import = { nodes: Node[]; notices: string[] };
 const steps = ['了解环境', '连接网络', '分配资源', '创建环境'];
@@ -39,6 +39,7 @@ function App() {
   const [resources,setResources] = useState<Resources>(product.defaults);
   const [busy,setBusy] = useState(false);
   const [hostAccessPending,setHostAccessPending] = useState(false);
+  const [collapsed,setCollapsed] = useState(false);
   const [error,setError] = useState('');
   const hostRequest = useRef(0);
   async function refreshHost(resetView = false) {
@@ -100,33 +101,36 @@ function App() {
   const showDesktop = () => perform(()=>invoke('show_desktop'));
   const changeHostAccess = (enabled:boolean) => perform(async()=>{
     setHostAccessPending(enabled);
-    try { await invoke('set_host_access',{enabled}); } finally { setHostAccessPending(false); }
+    try { await invoke('set_host_access',{enabled}); await refreshHost(); } finally { setHostAccessPending(false); }
   });
   const firstRun = view.environment === 'none' || view.task === 'install';
   const currentStep = configuring ? 3 : step;
   const navLocked = busy || view.task !== null || view.phase === 'stopping';
   const diskFits = resources.disk_gib >= host.runtime_profile.min_disk_gib && resources.disk_gib <= host.storage.disk_limit_gib && host.hardware.free_disk_gib >= product.limits.min_free_disk_gib;
   const alert = error || (view.phase === 'failed' ? view.message : '');
-  const trail = firstRun ? ['创建工作环境', steps[currentStep]] : screen === 'chat' ? ['对话'] : screen === 'browser' ? ['浏览器'] : screen === 'network' ? ['我的环境', '网络节点'] : screen === 'shortcuts' ? ['我的环境', '快捷键'] : configuring ? ['我的环境', '正在配置'] : ['我的环境'];
+  const trail = firstRun ? ['创建工作环境', steps[currentStep]] : screen === 'network' ? ['我的环境', '网络节点'] : screen === 'shortcuts' ? ['我的环境', '快捷键'] : configuring ? ['我的环境', '正在配置'] : ['我的环境'];
   const picker = {input,setInput,subscription,selected,setSelected,busy,onImport:importNodes};
   const platformName = host.platform === 'macos-aarch64' ? 'Mac · Apple Silicon' : host.platform === 'windows-x86_64' ? 'Windows · x86_64' : host.platform;
+  // Collapsed, the sidebar keeps only its icons; their names show on hover.
+  const tip = (label:string) => collapsed ? label : undefined;
   return <div className="app-shell">
-    <aside className="sidebar">
+    <aside className={`sidebar ${collapsed?'collapsed':''}`}>
+      <button className="drawer-toggle" aria-label={collapsed?'展开侧栏':'收起侧栏'} title={collapsed?'展开侧栏':'收起侧栏'} onClick={()=>setCollapsed(!collapsed)}>{collapsed?<PanelLeftOpen size={16}/>:<PanelLeftClose size={16}/>}</button>
       <div className="brand"><div className="brand-mark"><i/><i/><i/></div><span>{product.name.toUpperCase()}<span className="brand-sub">{product.full_name}</span></span></div>
       <div className="side-heading">一个环境。专注一件事。</div>
       {firstRun
-        ?<nav aria-label="安装步骤">{steps.map((label,index)=><div key={label} className={`nav-step ${currentStep===index?'active':''} ${currentStep>index?'passed':''}`}><span className="step-number">{currentStep>index?<Check size={14}/>:String(index+1).padStart(2,'0')}</span><span>{label}</span>{currentStep===index&&<span className="active-dot"/>}</div>)}</nav>
+        ?<nav aria-label="安装步骤">{steps.map((label,index)=><div key={label} title={tip(label)} className={`nav-step ${currentStep===index?'active':''} ${currentStep>index?'passed':''}`}><span className="step-number">{currentStep>index?<Check size={14}/>:String(index+1).padStart(2,'0')}</span><span className="nav-label">{label}</span>{currentStep===index&&<span className="active-dot"/>}</div>)}</nav>
         :<nav aria-label="环境导航">
-          <button className={`nav-step ${screen==='chat'?'active':''}`} disabled={!chatUser} onClick={()=>setPage('chat')}><span className="step-number"><MessageSquare size={13}/></span><span>对话</span>{screen==='chat'&&<span className="active-dot"/>}</button>
-          <button className={`nav-step ${screen==='browser'?'active':''}`} disabled={!chatUser} onClick={()=>setPage('browser')}><span className="step-number"><Globe size={13}/></span><span>浏览器</span>{screen==='browser'&&<span className="active-dot"/>}</button>
-          <button className={`nav-step ${screen==='home'?'active':''}`} disabled={configuring} onClick={()=>setPage('home')}><span className="step-number"><Monitor size={13}/></span><span>我的环境</span>{screen==='home'&&<span className="active-dot"/>}</button>
-          <button className={`nav-step ${screen==='network'||configuring?'active':''}`} disabled={navLocked} onClick={()=>setPage('network')}><span className="step-number"><Network size={13}/></span><span>网络节点</span>{(screen==='network'||configuring)&&<span className="active-dot"/>}</button>
-          <button className={`nav-step ${screen==='shortcuts'?'active':''}`} disabled={configuring} onClick={()=>setPage('shortcuts')}><span className="step-number"><Keyboard size={13}/></span><span>快捷键</span>{screen==='shortcuts'&&<span className="active-dot"/>}</button>
+          <button title={tip('对话')} className={`nav-step ${screen==='chat'?'active':''}`} disabled={!chatUser} onClick={()=>setPage('chat')}><span className="step-number"><MessageSquare size={13}/></span><span className="nav-label">对话</span>{screen==='chat'&&<span className="active-dot"/>}</button>
+          <button title={tip('浏览器')} className={`nav-step ${screen==='browser'?'active':''}`} disabled={!chatUser} onClick={()=>setPage('browser')}><span className="step-number"><Globe size={13}/></span><span className="nav-label">浏览器</span>{screen==='browser'&&<span className="active-dot"/>}</button>
+          <button title={tip('我的环境')} className={`nav-step ${screen==='home'?'active':''}`} disabled={configuring} onClick={()=>setPage('home')}><span className="step-number"><Monitor size={13}/></span><span className="nav-label">我的环境</span>{screen==='home'&&<span className="active-dot"/>}</button>
+          <button title={tip('网络节点')} className={`nav-step ${screen==='network'||configuring?'active':''}`} disabled={navLocked} onClick={()=>setPage('network')}><span className="step-number"><Network size={13}/></span><span className="nav-label">网络节点</span>{(screen==='network'||configuring)&&<span className="active-dot"/>}</button>
+          <button title={tip('快捷键')} className={`nav-step ${screen==='shortcuts'?'active':''}`} disabled={configuring} onClick={()=>setPage('shortcuts')}><span className="step-number"><Keyboard size={13}/></span><span className="nav-label">快捷键</span>{screen==='shortcuts'&&<span className="active-dot"/>}</button>
         </nav>}
       <div className="side-bottom"><div className="side-note"><span className="status-dot"/> LOCAL WORKSPACE</div><p>你的系统，保持原样。<br/>新的工作，从这里开始。</p><div className="edition">DESKTOP / {product.version}</div></div>
     </aside>
     <main className={workspacePage(screen)?'chat-main':''}>
-      <header><div className="breadcrumb">{trail.map((part,index)=><React.Fragment key={part}>{index>0&&<span>/</span>}{part}</React.Fragment>)}</div><span className="platform"><Monitor size={14}/>{platformName}</span></header>
+      {!workspacePage(screen)&&<header><div className="breadcrumb">{trail.map((part,index)=><React.Fragment key={part}>{index>0&&<span>/</span>}{part}</React.Fragment>)}</div><span className="platform"><Monitor size={14}/>{platformName}</span></header>}
       {chatUser&&<BrowserPane visible={screen==='browser'} platform={host.platform}/>}
       {chatUser&&<ChatPane visible={screen==='chat'} user={chatUser} onBrowser={()=>setPage('browser')} alert={alert&&<div role="alert" className="error-banner chat-error"><span>{alert}</span>{error&&<button aria-label="关闭提示" onClick={()=>setError('')}><X size={16}/></button>}</div>}/>}
       {!workspacePage(screen)&&<div className="main-content">
@@ -177,7 +181,7 @@ function Welcome({host,view,busy,onChooseAssets,onChooseStorage,onDownload,onNex
       <div className="diagram-host"><Monitor size={17}/><span>你的电脑</span><span className="small-label">macOS / Windows</span></div>
       <div className="diagram-guest"><div className="guest-caption"><span className="status-dot"/> 独立虚拟环境 <span className="small-label">OMARCHY</span></div><div className="guest-parts"><div><Terminal size={22}/><b>Claude Code</b><span>默认 Agent</span></div><div className="diagram-plus">+</div><div><Network size={22}/><b>sing-box</b><span>客机网络服务</span></div><div className="diagram-plus">+</div><div><HardDrive size={22}/><b>独立磁盘</b><span>项目与账号留在这里</span></div></div></div>
     </div>
-    <div className="principles"><span><LockKeyhole size={15}/>本机文字可粘贴进虚拟机，虚拟机默认访问不到本机</span><span><KeyRound size={15}/>独立登录 Claude 账号</span></div>
+    <div className="principles"><span><LockKeyhole size={15}/>本机文字可粘贴进虚拟机；虚拟机默认可以访问本机，随时可以关闭</span><span><KeyRound size={15}/>独立登录 Claude 账号</span></div>
     <AssetRow host={host} busy={busy} onChooseAssets={onChooseAssets}/>
     <StorageLocation host={host} busy={busy} onChoose={onChooseStorage}/>
     <div className="hardware-line"><span>{host.cpu_count} 核处理器 · {host.hardware.memory_mib/1024} GB 内存 · {host.hardware.free_disk_gib} GB 可用空间</span><span>{host.hardware.prerequisite}</span></div>
@@ -252,6 +256,8 @@ function Home({host,view,busy,hostAccessPending,chatReady,onChat,onDesktop,onSta
   const next = waiting ? null : needsRestart ? ['生效步骤','重启 Omarchy 应用语言设置','重启后检查语言、固定时区和浏览器配置，通过后才会显示就绪。']
     : chatReady ? ['下一步','进入对话，使用 Claude Code','首次使用先在终端里登录 Claude。账号与工作文件保留在虚拟机里。'] : null;
   const region = delivery?.region;
+  // Access is on only when the switch is on and this computer's SSH service answers.
+  const hostAccessOn = view.host_access && host.host_access_service_ready;
   return <>
     <div className="eyebrow">YOUR LOCAL WORKSPACE</div>
     <div className="ready-heading"><h1 className="compact">{title}<br/><em>{subtitle}</em></h1>{environment==='ready'&&running&&!waiting&&!failed&&<div className="ready-seal"><Check size={30}/></div>}</div>
@@ -267,7 +273,7 @@ function Home({host,view,busy,hostAccessPending,chatReady,onChat,onDesktop,onSta
     {region&&<div className="region-result"><Globe2 size={17}/><span>实测出口 {region.country} · 系统 {region.locale} · 浏览器 {region.browser_language}<br/>固定时区 {region.timezone}</span></div>}
     {delivery?.proxy_required&&delivery.network_guard_active&&<div className="quiet-note"><LockKeyhole size={16}/><p>网络保护已启用：应用只能通过代理联网，代理停止时自动断网。</p></div>}
     {host.graphics.available&&<div className="host-access"><Monitor size={18}/><div><strong>兼容显示</strong><p>{host.graphics.software_rendering?'已开启，使用 CPU 绘制桌面，图形性能会有所降低。此选择会保留到下次启动。':'图形加速无法启动时可开启，继续使用原来的环境和文件。'}{running?' 请先正常关机再更改。':''}</p></div><button className="secondary" disabled={locked||running} onClick={()=>onSoftwareRendering(!host.graphics.software_rendering)}>{host.graphics.software_rendering?'关闭兼容显示':'开启兼容显示'}</button></div>}
-    {environment==='ready'&&<div className="host-access"><Terminal size={18}/><div><strong>允许虚拟机访问本机</strong><p>{hostAccessPending&&host.platform==='windows-x86_64'?'正在准备本机 SSH 服务。请在 Windows 管理员授权窗口中确认；首次安装可能需要几分钟。':!view.host_access?`打开后，虚拟机里的 Claude Code 可以用 ssh ${product.host_access.alias} 操作这台电脑，权限和你一样。`:delivery?.host_access_active?`已打开。在虚拟机里用 ssh ${product.host_access.alias} 操作这台电脑。`:'已打开，重启虚拟机后生效。'}</p></div><button className="secondary" disabled={locked} onClick={()=>onHostAccess(!view.host_access)}>{hostAccessPending?<><LoaderCircle className="spin" size={16}/>正在打开</>:view.host_access?'关闭':'打开'}</button></div>}
+    {environment==='ready'&&<div className="host-access"><Terminal size={18}/><div><strong>允许虚拟机访问本机</strong><p>{hostAccessPending&&host.platform==='windows-x86_64'?'正在准备本机 SSH 服务。请在 Windows 管理员授权窗口中确认；首次安装可能需要几分钟。':!view.host_access?`打开后，虚拟机里的 Claude Code 可以用 ssh ${product.host_access.alias} 操作这台电脑，权限和你一样。`:!host.host_access_service_ready?host.runtime_profile.host_access_service_hint:delivery?.host_access_active?`已打开。在虚拟机里用 ssh ${product.host_access.alias} 操作这台电脑。`:'已打开，重启虚拟机后生效。'}</p></div><button className="secondary" disabled={locked} onClick={()=>onHostAccess(!hostAccessOn)}>{hostAccessPending?<><LoaderCircle className="spin" size={16}/>正在打开</>:hostAccessOn?'关闭':'打开'}</button></div>}
     <footer><p>数据保留在本地独立磁盘。</p><div className="actions">
       {running&&<button className="secondary" disabled={busy||stopping} onClick={onDesktop}><Monitor size={17}/>打开桌面</button>}
       {running&&<button className="secondary" disabled={busy||stopping} onClick={onStop}><Power size={17}/>正常关机</button>}

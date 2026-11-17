@@ -103,7 +103,7 @@ Mac ARM 客机使用 `try-omarchy-timezone --select` 并核实模式为 `fixed`�
 
 ## 访问本机
 
-“允许虚拟机访问本机”默认关闭。打开后，下一次开机时客机为账号生成 SSH 密钥，私钥留在客机，公钥经回执交给桌面端，校验格式后写入宿主 `~/.ssh/authorized_keys`，限定来源为回环地址并禁用转发。QEMU 用户网络把 `host_access.address` 映射到宿主回环。
+“允许虚拟机访问本机”在新环境里默认打开（`host_access.enabled_by_default`），用户可以关闭。本机 SSH 服务没有应答时（Mac 未开“远程登录”、Windows 未装 OpenSSH 服务器），开关显示为未打开并给出平台提示，点“打开”重新检查或准备服务。打开时，开机配置中客机为账号生成 SSH 密钥，私钥留在客机，公钥经回执交给桌面端，校验格式后写入宿主 `~/.ssh/authorized_keys`，限定来源为回环地址并禁用转发。QEMU 用户网络把 `host_access.address` 映射到宿主回环。
 
 断网保护只放行账号 UID 到该地址 SSH 端口的 TCP，TUN 用 `route_exclude_address` 排除该地址，其他内网和宿主端口继续拦截。客机写入 `~/.ssh/config` 的 `host` 别名和 `~/.claude/CLAUDE.md` 的说明。关闭时桌面端立即删除授权行，下一次开机撤销规则和别名。
 
@@ -143,6 +143,8 @@ Windows 的 set_host_access 在后台任务中准备服务，操作锁避免与�
 - 尺寸：页面按显示区域 CSS 尺寸乘取整后的设备像素比设置虚拟屏幕分辨率和缩放；区域变化时经 stdin 更新。
 - 键盘：Mac 的 Command 在 noVNC 里是 Super（Omarchy 的窗口管理键），本页把它换成 Ctrl，复制、粘贴、新建/关闭标签页按浏览器习惯生效。中文用虚拟机里的输入法，或用本机复制、虚拟机粘贴。
 - 剪贴板：不处理 noVNC 的剪贴板事件，虚拟机内容不回本机；本机文字仍经单向剪贴板进入虚拟机。
+- 指针：画面上显示本机的箭头指针，不随画面往返。noVNC 会把画布指针换成服务端发来的光标图像，而本镜像的 Hyprland 0.56 经 ext-image-copy-capture 光标会话给 wayvnc 的图像是全空的（关掉硬件光标也一样，2026-11-17 实测）；Omarchy 的启动光标脚本还常让 `cursor.invisible` 整个会话保持开启。所以样式表用 `cursor:default!important` 盖过 noVNC 设的行内样式。代价是悬停链接、文本框时不变成手形或 I 形。
+
 - 生命周期：SSH 断开时 stdin 关闭，脚本停止 wayvnc、取消全屏并移除虚拟屏幕，浏览器窗口回到虚拟机自己的桌面。关机、关闭软件时与对话连接一起断开。
 
 ## 单向剪贴板

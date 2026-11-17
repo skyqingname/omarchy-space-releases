@@ -33,7 +33,7 @@ pub struct NetworkGuard {
     pub restart_seconds: u64, pub dhcp_server: String, pub blocked_destination_cidrs: Vec<String>,
 }
 #[derive(Clone, Deserialize, Serialize)]
-pub struct HostAccessConfig { pub address: String, pub port: u16, pub alias: String, pub key_comment: String, pub key_options: String, pub check_timeout_seconds: u64 }
+pub struct HostAccessConfig { pub address: String, pub port: u16, pub alias: String, pub key_comment: String, pub key_options: String, pub check_timeout_seconds: u64, pub enabled_by_default: bool }
 #[derive(Clone, Deserialize, Serialize)]
 pub struct TerminalConfig {
     pub guest_port: u16, pub forward_address: String, pub ssh_service: String, pub host_key_alias: String,
