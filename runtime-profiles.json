@@ -73,15 +73,15 @@
     "downloads": {
       "factory.img.zst": [
         {
-          "url": "https://github.com/omacom/try-omarchy/releases/download/v1.2.0/omarchy-aarch64-edge.img.zst.001",
+          "url": "https://download.maqihang.si/releases/gotocs/images/macos-aarch64/v1.2.0/omarchy-aarch64-edge.img.zst.001",
           "bytes": 1073741824
         },
         {
-          "url": "https://github.com/omacom/try-omarchy/releases/download/v1.2.0/omarchy-aarch64-edge.img.zst.002",
+          "url": "https://download.maqihang.si/releases/gotocs/images/macos-aarch64/v1.2.0/omarchy-aarch64-edge.img.zst.002",
           "bytes": 1073741824
         },
         {
-          "url": "https://github.com/omacom/try-omarchy/releases/download/v1.2.0/omarchy-aarch64-edge.img.zst.003",
+          "url": "https://download.maqihang.si/releases/gotocs/images/macos-aarch64/v1.2.0/omarchy-aarch64-edge.img.zst.003",
           "bytes": 1019160722
         }
       ]

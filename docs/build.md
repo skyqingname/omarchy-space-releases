@@ -52,7 +52,7 @@ python3 scripts/package-windows.py
 
 脚本生成 `assets/windows-x86_64/manifest.json`；Tauri 的 Windows 资源映射位于 `src-tauri/tauri.windows.conf.json`。可移植 ZIP 包含 EXE 与相邻 `resources/` 文件夹，两者必须一起分发。只复制 EXE 会导致资源检测失败。
 
-当前源码及 2026-11-13 Windows 包的镜像地址为 DMIT，详情见 [镜像源说明](image-mirror.md)。2026-11-10 ZIP 早于该配置变更，旧附件保留原样。
+当前源码的 Mac、Windows 镜像地址均为 DMIT，详情见 [镜像源说明](image-mirror.md)。Windows 自 2026-11-13 完整包起采用该源；Mac 自 v0.1.0-20261117.1 起采用该源。旧标签和附件保留原样，已有客户端不会自动切源。
 
 ## 参数、产物与数据
 
