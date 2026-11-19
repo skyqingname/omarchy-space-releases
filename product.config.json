@@ -12,7 +12,7 @@
     "min_memory_mib": 4096,
     "max_memory_mib": 32768,
     "host_memory_mib": 2048,
-    "min_free_disk_gib": 20,
+    "min_free_disk_gib": 10,
     "max_disk_gib": 512
   },
   "subscription": {

@@ -177,7 +177,7 @@ Claude Code 由客机在节点核验通过后，以账号身份运行 `guest.cla
 
 `storage.rs` 负责位置偏好、目录身份和禁止迁移的校验；任务入口与结束通过同一操作锁协调，下载、启动或配置进行中不能换路径。VM 任务持有启动时的数据目录快照。已有 vm/disk.img 或 machine.json 时不允许更换到其他目录，目标 vm 非空也拒绝覆盖。更换位置不会搬动旧下载文件。
 
-Windows 空间查询通过 GetDiskFreeSpaceExW 对解析后的实际目录进行，避免把 C 盘上的目录联接误当成 C 盘容量。可选磁盘上限为所选卷可用 GiB 与产品最大值的较小值，创建前重新查询并在后端校验。最小磁盘由编译进客户端的 runtime-profiles.json 决定：Windows 16 GiB，Mac 32 GiB。RuntimeProfile 负责读取和校验，inspect_host 返回 runtime_profile.min_disk_gib，UI 输入/滑块/创建按钮和后端 start_install 使用同一平台值。外部资源包 Manifest 没有新增必需字段，旧离线包可继续使用。全局默认 64 GiB、最大 512 GiB 及创建前至少 20 GiB 可用空间仍在 product.config.json；vm::prepare 在扩容前继续拒绝小于实际出厂镜像的磁盘。
+Windows 空间查询通过 GetDiskFreeSpaceExW 对解析后的实际目录进行，避免把 C 盘上的目录联接误当成 C 盘容量。可选磁盘上限为所选卷可用 GiB 与产品最大值的较小值，且不低于平台最小磁盘（虚拟磁盘是稀疏文件，按实际写入占用），创建前重新查询并在后端校验。最小磁盘由编译进客户端的 runtime-profiles.json 决定：Windows 16 GiB，Mac 20 GiB（Mac 出厂镜像原始大小 20 GiB，实际数据约 9.5 GiB）。RuntimeProfile 负责读取和校验，inspect_host 返回 runtime_profile.min_disk_gib，UI 输入/滑块/创建按钮和后端 start_install 使用同一平台值。外部资源包 Manifest 没有新增必需字段，旧离线包可继续使用。全局默认 64 GiB、最大 512 GiB 及创建前至少 10 GiB 可用空间仍在 product.config.json；vm::prepare 在扩容前继续拒绝小于实际出厂镜像的磁盘。
 
 应用只管理单个环境；第二次打开客户端会聚焦现有窗口。运行代次用于丢弃旧安装线程在关机/重启后的迟到状态。
 

@@ -130,11 +130,17 @@ impl RuntimeProfile {
         profiles.remove(platform).ok_or_else(|| format!("缺少平台运行配置：{platform}"))
     }
 
+    // The virtual disk is a sparse file, so the platform minimum is selectable
+    // even when the volume has less free space than its nominal size.
+    pub fn disk_limit_gib(&self, free_disk_gib: u64, limits: &Limits) -> u64 {
+        free_disk_gib.min(limits.max_disk_gib).max(self.min_disk_gib)
+    }
+
     pub fn validate_disk(&self, disk_gib: u64, free_disk_gib: u64, limits: &Limits) -> Result<(), String> {
         if disk_gib < self.min_disk_gib {
             return Err(format!("当前平台的虚拟磁盘至少需要 {} GB", self.min_disk_gib));
         }
-        let maximum = free_disk_gib.min(limits.max_disk_gib);
+        let maximum = self.disk_limit_gib(free_disk_gib, limits);
         if disk_gib > maximum {
             return Err(format!("所选位置当前最多可分配 {maximum} GB 虚拟磁盘，请调整容量或更换存放位置"));
         }
@@ -185,10 +191,10 @@ mod tests {
         assert!(windows.validate_disk(16, 64, &cfg.limits).is_ok());
         assert!(windows.validate_disk(15, 64, &cfg.limits).is_err());
         assert!(mac.validate_disk(16, 64, &cfg.limits).is_err());
-        assert!(mac.validate_disk(31, 64, &cfg.limits).is_err());
-        assert!(mac.validate_disk(32, 64, &cfg.limits).is_ok());
+        assert!(mac.validate_disk(19, 64, &cfg.limits).is_err());
+        assert!(mac.validate_disk(20, 64, &cfg.limits).is_ok());
         assert_eq!(cfg.defaults.disk_gib, 64);
-        assert_eq!(cfg.limits.min_free_disk_gib, 20);
+        assert_eq!(cfg.limits.min_free_disk_gib, 10);
         assert!(RuntimeProfile::load("unsupported-platform").is_err());
     }
 
@@ -201,7 +207,8 @@ mod tests {
             assert!(profile.validate_disk(41, 40, &cfg.limits).is_err());
             assert!(profile.validate_disk(512, 1024, &cfg.limits).is_ok());
             assert!(profile.validate_disk(513, 1024, &cfg.limits).is_err());
-            assert!(profile.validate_disk(profile.min_disk_gib, profile.min_disk_gib - 1, &cfg.limits).is_err());
+            assert!(profile.validate_disk(profile.min_disk_gib, cfg.limits.min_free_disk_gib, &cfg.limits).is_ok());
+            assert!(profile.validate_disk(profile.min_disk_gib + 1, cfg.limits.min_free_disk_gib, &cfg.limits).is_err());
         }
     }
 

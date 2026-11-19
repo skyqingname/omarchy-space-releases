@@ -51,8 +51,8 @@ fn host_snapshot(state: &AppState) -> Result<Value, String> {
     };
     let supported = matches!((std::env::consts::OS,std::env::consts::ARCH), ("macos","aarch64") | ("windows","x86_64"));
     let hardware = host::inspect(&data_dir)?;
-    let disk_limit_gib = hardware.free_disk_gib.min(state.config.limits.max_disk_gib);
     let runtime_profile = RuntimeProfile::load(&config::platform())?;
+    let disk_limit_gib = runtime_profile.disk_limit_gib(hardware.free_disk_gib, &state.config.limits);
     let software_rendering = if data_dir.join("vm/machine.json").is_file() { vm::read_machine(&data_dir)?.software_rendering } else { false };
     Ok(json!({"platform":config::platform(),"supported":supported,"cpu_count":hardware.cpus,"hardware":hardware,
         "assets":assets,"asset_root":root,"data_directory":data_dir,"config":state.config,

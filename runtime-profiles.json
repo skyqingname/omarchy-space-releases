@@ -1,7 +1,7 @@
 {
   "macos-aarch64": {
     "platform": "macos-aarch64",
-    "min_disk_gib": 32,
+    "min_disk_gib": 20,
     "host_access_service_hint": "本机没有开启 SSH 服务。请到系统设置 → 通用 → 共享，打开“远程登录”，然后重试。",
     "terminal": {
       "ssh": "/usr/bin/ssh",
